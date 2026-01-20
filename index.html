@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Mestre FGV | APM 2026</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300&family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'], // Títulos
+                        serif: ['Merriweather', 'serif'],   // Texto corrido (Melhor leitura)
+                    },
+                    colors: {
+                        bg: '#121212',       /* Preto Suave */
+                        paper: '#1e1e1e',    /* Card */
+                        border: '#2e2e2e',
+                        text: '#e0e0e0',
+                        muted: '#a0a0a0',
+                        primary: '#3b82f6',  /* Azul */
+                        success: '#10b981',  /* Verde */
+                        danger: '#ef4444',   /* Vermelho */
+                        warning: '#f59e0b',  /* Amarelo */
+                    }
+                }
+            }
+        }
+    </script>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <style>
+        /* Ajustes finos */
+        body { font-size: 17px; line-height: 1.8; }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Montserrat', sans-serif; }
+        
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #121212; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 5px; border: 2px solid #121212; }
+        
+        /* Efeito 3D Flashcards */
+        .perspective-1000 { perspective: 1000px; }
+        .preserve-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+    </style>
+</head>
+
+<body class="bg-bg text-text font-serif antialiased" x-data="{ sidebarOpen: false }">
+
+    <div class="lg:hidden fixed top-0 w-full z-50 bg-paper/95 backdrop-blur border-b border-border px-4 py-3 flex items-center justify-between shadow-md">
+        <span class="font-sans font-bold text-lg tracking-tight text-white">Manual FGV</span>
+        <button @click="sidebarOpen = !sidebarOpen" class="p-2 text-muted hover:text-white"><i data-lucide="menu"></i></button>
+    </div>
+
+    <div class="flex h-screen overflow-hidden pt-16 lg:pt-0">
+
+        <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" class="fixed inset-y-0 left-0 z-40 w-80 bg-paper border-r border-border transition-transform duration-300 lg:translate-x-0 lg:static flex flex-col font-sans shadow-2xl lg:shadow-none">
+            <div class="p-8 border-b border-border">
+                <h1 class="font-extrabold text-2xl tracking-tighter text-white">FOCO<span class="text-primary">.FGV</span></h1>
+                <p class="text-xs text-muted mt-1 font-medium tracking-widest uppercase">Conteúdo Completo</p>
+            </div>
+            
+            <nav class="flex-1 overflow-y-auto p-6 space-y-8 scroll-smooth">
+                <div>
+                    <h3 class="text-xs font-bold text-muted uppercase tracking-widest mb-3 px-2">Parte 1: Gramática</h3>
+                    <ul class="space-y-1">
+                        <li><a href="#crase" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="hash" class="w-4 h-4 text-primary"></i> 1. Crase (Completo)</a></li>
+                        <li><a href="#tipos-textuais" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="layers" class="w-4 h-4 text-purple-500"></i> 2. Tipos Textuais</a></li>
+                        <li><a href="#extras" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="zap" class="w-4 h-4 text-yellow-500"></i> 3. Mnemônicos</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-xs font-bold text-muted uppercase tracking-widest mb-3 px-2">Parte 2: Texto</h3>
+                    <ul class="space-y-1">
+                        <li><a href="#conectivos" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="link" class="w-4 h-4 text-emerald-500"></i> 4. Conectivos</a></li>
+                        <li><a href="#vozes" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="refresh-cw" class="w-4 h-4 text-blue-400"></i> 5. Vozes Verbais</a></li>
+                        <li><a href="#pontuacao" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="alert-circle" class="w-4 h-4 text-red-500"></i> 6. Pontuação</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto relative w-full bg-bg scroll-smooth">
+            <div class="max-w-4xl mx-auto px-6 py-12 lg:py-20 space-y-32 pb-40">
+
+                <article id="crase" class="scroll-mt-24">
+                    <header class="mb-8 border-b border-border pb-6">
+                        <span class="font-sans text-xs font-bold text-primary tracking-widest uppercase mb-2 block">Alta Incidência</span>
+                        <h2 class="text-4xl font-extrabold text-white mb-2">1. Crase: Resumo Completo</h2>
+                        <p class="text-muted">A fusão de A + A. Palavras-chave para memorização.</p>
+                    </header>
+
+                    <div class="space-y-8">
+                        <div class="bg-paper p-6 rounded-xl border border-border">
+                            <h3 class="text-xl font-bold text-white mb-4 font-sans">🔑 Fórmula Básica</h3>
+                            <div class="space-y-2 text-sm text-gray-300">
+                                <p>Crase = Preposição "a" + Artigo "a" = <strong>à</strong></p>
+                                <p>Crase = Preposição "a" + Pronome "aquela" = <strong>àquela</strong></p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <h3 class="text-2xl font-bold text-success font-sans flex items-center gap-2"><i data-lucide="check-circle"></i> Zona Verde (Use)</h3>
+                            <div class="grid gap-4">
+                                <div class="bg-paper p-5 rounded-lg border-l-4 border-success">
+                                    <strong class="text-white block font-sans text-lg">1. Palavra Feminina (Teste do AO)</strong>
+                                    <p class="text-gray-300 mt-1">Frase: <em>Entreguei à diretora.</em></p>
+                                    <p class="text-gray-300">Teste: <em>Entreguei <strong>AO</strong> diretor.</em></p>
+                                    <p class="text-success font-bold mt-1">✅ Virou AO? → TEM crase.</p>
+                                </div>
+                                <div class="bg-paper p-5 rounded-lg border-l-4 border-success">
+                                    <strong class="text-white block font-sans text-lg">2. Verbos de Destino</strong>
+                                    <p class="text-gray-300 mt-1 font-mono text-sm bg-black/30 p-2 rounded inline-block">
+                                        Vou a, volto DA → crase HÁ.<br>
+                                        Vou a, volto DE → crase pra QUÊ.
+                                    </p>
+                                    <p class="text-xs text-muted mt-2">Ex: À Bahia (Volto da), A Roma (Volto de).</p>
+                                </div>
+                                <div class="bg-paper p-5 rounded-lg border-l-4 border-success">
+                                    <strong class="text-white block font-sans text-lg">3. Locuções Femininas</strong>
+                                    <p class="text-gray-300">Tempo, Modo, Lugar. Se tirar a crase, "soa errado".</p>
+                                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2 mt-3 text-sm text-muted">
+                                        <span>• À noite</span>
+                                        <span>• Às pressas</span>
+                                        <span>• À direita</span>
+                                        <span>• À medida que</span>
+                                        <span>• À procura de</span>
+                                        <span>• À espera de</span>
+                                    </div>
+                                </div>
+                                <div class="bg-paper p-5 rounded-lg border-l-4 border-success">
+                                    <strong class="text-white block font-sans text-lg">4. Horas e "Moda de"</strong>
+                                    <p class="text-gray-300">Horas exatas: <em>Às 14h.</em></p>
+                                    <p class="text-gray-300">Moda de (mesmo oculto): <em>Gol à Pelé, Bife à milanesa.</em></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <h3 class="text-2xl font-bold text-danger font-sans flex items-center gap-2"><i data-lucide="ban"></i> Zona Vermelha (M.V.P.)</h3>
+                            <div class="bg-danger/5 border border-danger/30 p-6 rounded-xl">
+                                <ul class="space-y-4 text-gray-300">
+                                    <li>🚫 <strong>M — Masculino:</strong> <em>A pé, A prazo, A cavalo, A lápis.</em></li>
+                                    <li>🚫 <strong>V — Verbo:</strong> <em>A partir, A cantar, A estudar.</em> ("Diante de verbo, crase não acerto").</li>
+                                    <li>🚫 <strong>P — Plural:</strong> "A" (singular) + Palavra no plural. <em>(Refiro-me a pessoas).</em></li>
+                                    <li>🚫 <strong>Pronomes Pessoais:</strong> <em>A ela, A mim, A ti.</em></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="bg-paper border border-warning/30 p-6 rounded-xl">
+                            <h3 class="text-warning font-bold font-sans mb-2">⚠️ Facultativa (Tanto faz)</h3>
+                            <ul class="list-disc pl-5 space-y-1 text-gray-300">
+                                <li>Nome de mulher (A / À Maria).</li>
+                                <li>Pronome possessivo feminino (A / À minha).</li>
+                                <li>Depois de "Até" (Até a / Até à porta).</li>
+                            </ul>
+                        </div>
+
+                        <div class="p-6 bg-black/40 border border-border rounded-xl">
+                            <h4 class="font-bold text-white mb-4 font-sans text-lg">⚠️ Pegadinhas Clássicas FGV</h4>
+                            <div class="space-y-3">
+                                <div>
+                                    <strong class="text-danger">❌ A PRAZO / A VISTA</strong>
+                                    <p class="text-sm text-muted">"Prazo" é masculino. "A vista" em prova, prefira sem crase.</p>
+                                </div>
+                                <div>
+                                    <strong class="text-danger">❌ CASA / TERRA</strong>
+                                    <p class="text-sm text-muted">Só tem crase se tiver DONO (especificada).</p>
+                                    <p class="text-xs text-gray-400"><em>Cheguei a casa.</em> (Sem) | <em>Cheguei à casa da Maria.</em> (Com)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <hr class="border-border">
+
+                <article id="tipos-textuais" class="scroll-mt-24">
+                    <header class="mb-8 border-b border-border pb-6 flex justify-between items-end">
+                        <div>
+                            <h2 class="font-sans text-4xl font-extrabold text-white mb-2">2. Tipos Textuais</h2>
+                            <p class="text-muted">Palavras-chave estruturais.</p>
+                        </div>
+                        <span class="text-xs font-mono text-muted uppercase">Clique para virar</span>
+                    </header>
+
+                    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 font-sans">
+                        <div class="group h-64 w-full cursor-pointer perspective-1000" x-data="{ flipped: false }" @click="flipped = !flipped">
+                            <div class="relative w-full h-full duration-500 preserve-3d" :class="flipped ? 'rotate-y-180' : ''">
+                                <div class="absolute w-full h-full bg-paper border border-border rounded-xl flex flex-col items-center justify-center backface-hidden shadow-lg group-hover:border-primary transition-all">
+                                    <span class="text-4xl mb-4">🎬</span>
+                                    <h3 class="font-bold text-lg text-white">Narrativo</h3>
+                                </div>
+                                <div class="absolute w-full h-full bg-paper border-2 border-primary rounded-xl flex flex-col items-center justify-center backface-hidden rotate-y-180 p-4 text-center">
+                                    <h3 class="text-primary font-bold text-xl mb-2">FILME</h3>
+                                    <p class="text-sm text-muted">História, Tempo passa, Ação.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="group h-64 w-full cursor-pointer perspective-1000" x-data="{ flipped: false }" @click="flipped = !flipped">
+                            <div class="relative w-full h-full duration-500 preserve-3d" :class="flipped ? 'rotate-y-180' : ''">
+                                <div class="absolute w-full h-full bg-paper border border-border rounded-xl flex flex-col items-center justify-center backface-hidden shadow-lg group-hover:border-success transition-all">
+                                    <span class="text-4xl mb-4">🖼️</span>
+                                    <h3 class="font-bold text-lg text-white">Descritivo</h3>
+                                </div>
+                                <div class="absolute w-full h-full bg-paper border-2 border-success rounded-xl flex flex-col items-center justify-center backface-hidden rotate-y-180 p-4 text-center">
+                                    <h3 class="text-success font-bold text-xl mb-2">FOTO</h3>
+                                    <p class="text-sm text-muted">Retrato, Adjetivos, Cena Parada.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="group h-64 w-full cursor-pointer perspective-1000" x-data="{ flipped: false }" @click="flipped = !flipped">
+                            <div class="relative w-full h-full duration-500 preserve-3d" :class="flipped ? 'rotate-y-180' : ''">
+                                <div class="absolute w-full h-full bg-paper border border-border rounded-xl flex flex-col items-center justify-center backface-hidden shadow-lg group-hover:border-warning transition-all">
+                                    <span class="text-4xl mb-4">🧠</span>
+                                    <h3 class="font-bold text-lg text-white">Dissertativo</h3>
+                                </div>
+                                <div class="absolute w-full h-full bg-paper border-2 border-warning rounded-xl flex flex-col items-center justify-center backface-hidden rotate-y-180 p-4 text-center">
+                                    <h3 class="text-warning font-bold text-xl mb-2">IDEIA</h3>
+                                    <p class="text-xs text-muted mb-1">Argumentativo: Convencer.</p>
+                                    <p class="text-xs text-muted">Expositivo: Informar.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="group h-64 w-full cursor-pointer perspective-1000" x-data="{ flipped: false }" @click="flipped = !flipped">
+                            <div class="relative w-full h-full duration-500 preserve-3d" :class="flipped ? 'rotate-y-180' : ''">
+                                <div class="absolute w-full h-full bg-paper border border-border rounded-xl flex flex-col items-center justify-center backface-hidden shadow-lg group-hover:border-danger transition-all">
+                                    <span class="text-4xl mb-4">🛠️</span>
+                                    <h3 class="font-bold text-lg text-white">Injuntivo</h3>
+                                </div>
+                                <div class="absolute w-full h-full bg-paper border-2 border-danger rounded-xl flex flex-col items-center justify-center backface-hidden rotate-y-180 p-4 text-center">
+                                    <h3 class="text-danger font-bold text-xl mb-2">ORDEM</h3>
+                                    <p class="text-sm text-muted">Imperativo. Instrução. (Receita).</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <hr class="border-border">
+
+                <article id="extras" class="scroll-mt-24">
+                    <h2 class="font-sans text-3xl font-extrabold text-white mb-6">3. Mnemônicos Extras</h2>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-paper p-5 rounded-xl border border-border">
+                            <strong class="text-primary block mb-2 font-sans">🧲 Próclise (NARIZ)</strong>
+                            <p class="text-sm text-muted mb-2">Palavras que puxam o pronome:</p>
+                            <ul class="text-sm text-gray-300 list-disc pl-4">
+                                <li><strong>N</strong>egação</li>
+                                <li><strong>A</strong>dvérbio</li>
+                                <li><strong>R</strong>elativo</li>
+                                <li><strong>I</strong>ndefinido</li>
+                                <li><strong>Z</strong> (Conjunção Subordinativa)</li>
+                            </ul>
+                        </div>
+                        <div class="bg-paper p-5 rounded-xl border border-border">
+                            <strong class="text-primary block mb-2 font-sans">🔄 LHE = DELE</strong>
+                            <p class="text-sm text-muted">Se trocar e fizer sentido → POSSE.</p>
+                            <p class="text-xs mt-2 italic text-gray-400">Ex: "Toquei-lhe o rosto" = "Toquei o rosto dele".</p>
+                        </div>
+                        <div class="bg-paper p-5 rounded-xl border border-border">
+                            <strong class="text-primary block mb-2 font-sans">🧱 HAVER vs TER</strong>
+                            <p class="text-sm text-muted">Haver = Existir (Singular). <br>Ter = Posse.</p>
+                            <p class="text-xs mt-2 text-danger">❌ "Tem gente aqui"</p>
+                            <p class="text-xs text-success">✅ "Há gente aqui"</p>
+                        </div>
+                        <div class="bg-paper p-5 rounded-xl border border-border">
+                            <strong class="text-primary block mb-2 font-sans">🎬 Filme vs Foto</strong>
+                            <p class="text-sm text-gray-300">Narração = Tempo anda (Filme).</p>
+                            <p class="text-sm text-gray-300">Dissertação/Descrição = Ideia parada (Foto).</p>
+                        </div>
+                    </div>
+                </article>
+
+                <hr class="border-border">
+
+                <article id="conectivos" class="scroll-mt-24">
+                    <header class="mb-8 border-b border-border pb-6">
+                        <h2 class="font-sans text-4xl font-extrabold text-white mb-2">4. Conectivos (A Alma)</h2>
+                        <p class="text-muted">A FGV pede a troca. Memorize os grupos.</p>
+                    </header>
+
+                    <div class="grid md:grid-cols-3 gap-4 font-sans">
+                        <div class="bg-paper p-6 rounded-xl border border-border text-center">
+                            <span class="text-xs font-bold text-danger uppercase tracking-wide">Adversativa</span>
+                            <h3 class="text-2xl font-black text-white my-2">MAS</h3>
+                            <p class="text-xs text-muted mb-4">Quebra de expectativa</p>
+                            <div class="text-sm text-gray-300 space-y-1 border-t border-border pt-4">
+                                <p>Porém</p><p>Contudo</p><p>Todavia</p><p>Entretanto</p>
+                            </div>
+                            <p class="text-xs text-danger mt-4 font-bold">⛔ Nunca "Embora"</p>
+                        </div>
+                        <div class="bg-paper p-6 rounded-xl border border-border text-center ring-1 ring-warning/50">
+                            <span class="text-xs font-bold text-warning uppercase tracking-wide">Concessiva</span>
+                            <h3 class="text-2xl font-black text-white my-2">EMBORA</h3>
+                            <p class="text-xs text-muted mb-4">Teimosia</p>
+                            <div class="text-sm text-gray-300 space-y-1 border-t border-border pt-4">
+                                <p>Conquanto</p><p>Ainda que</p><p>Mesmo que</p>
+                            </div>
+                            <p class="text-xs text-warning mt-4 font-bold">💡 Troca por "Apesar de"</p>
+                        </div>
+                        <div class="bg-paper p-6 rounded-xl border border-border text-center">
+                            <span class="text-xs font-bold text-primary uppercase tracking-wide">Causal</span>
+                            <h3 class="text-2xl font-black text-white my-2">PORQUE</h3>
+                            <p class="text-xs text-muted mb-4">Motivo / Razão</p>
+                            <div class="text-sm text-gray-300 space-y-1 border-t border-border pt-4">
+                                <p>Pois</p><p>Visto que</p><p>Porquanto</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 bg-paper p-6 rounded-xl border border-border font-sans">
+                        <h4 class="font-bold text-white mb-4">💀 Tabela da Morte (Parônimos)</h4>
+                        <ul class="space-y-2 text-sm text-gray-300">
+                            <li class="flex justify-between border-b border-border pb-2"><span class="text-warning font-bold">Conquanto</span> <span>= Embora (Teimosia)</span></li>
+                            <li class="flex justify-between border-b border-border pb-2"><span class="text-primary font-bold">Porquanto</span> <span>= Porque (Causa)</span></li>
+                            <li class="flex justify-between"><span class="text-danger font-bold">Contudo</span> <span>= Mas (Oposição)</span></li>
+                        </ul>
+                    </div>
+                </article>
+
+                <hr class="border-border">
+
+                <article id="vozes" class="scroll-mt-24">
+                    <h2 class="font-sans text-3xl font-extrabold text-white mb-6">5. Vozes Verbais</h2>
+                    <div class="bg-paper p-6 rounded-xl border border-border">
+                        <h3 class="font-bold text-white mb-4 font-sans">⚙️ O Algoritmo do "X"</h3>
+                        <ol class="list-decimal pl-5 space-y-3 text-gray-300 text-sm">
+                            <li>O <strong>Objeto</strong> vira Sujeito.</li>
+                            <li>O <strong>Sujeito</strong> vira Agente (final).</li>
+                            <li>O Verbo Principal ganha auxiliar <strong>SER</strong>.</li>
+                        </ol>
+                        <div class="mt-6 p-4 bg-black/30 rounded border border-white/5 text-center font-sans">
+                            <strong class="text-warning block mb-2 text-xs uppercase">Regra Importante</strong>
+                            <p class="text-sm text-white">O verbo "SER" deve entrar no <strong>mesmo tempo</strong> do original.</p>
+                            <p class="mt-2 text-emerald-400 font-mono text-sm">Divulgou (Passado) → Foi divulgado.</p>
+                            <p class="mt-1 text-emerald-400 font-mono text-sm">Divulgará (Futuro) → Será divulgado.</p>
+                        </div>
+                    </div>
+                </article>
+
+                <hr class="border-border">
+
+                <article id="pontuacao" class="scroll-mt-24">
+                    <h2 class="font-sans text-3xl font-extrabold text-white mb-6">6. Pontuação (Lógica)</h2>
+                    <div class="bg-danger/10 border border-danger/30 p-6 rounded-xl">
+                        <h3 class="text-danger font-bold mb-4 font-sans">🚫 Onde é PROIBIDO usar vírgula</h3>
+                        <p class="text-sm text-gray-300 mb-4">Entre o S.V.C. (Sujeito — Verbo — Complemento).</p>
+                        <div class="space-y-2 text-sm text-gray-400">
+                            <p>❌ Os alunos do curso, fizeram a prova. (Separou Sujeito).</p>
+                            <p>❌ O IBGE contratou, novos agentes. (Separou Objeto).</p>
+                        </div>
+                    </div>
+                    <div class="mt-6 bg-paper p-6 rounded-xl border border-border">
+                        <h3 class="font-bold text-white mb-3 font-sans">✅ Onde é Bem-vinda</h3>
+                        <ul class="list-disc pl-5 text-sm text-gray-300 space-y-2">
+                            <li><strong>Deslocado:</strong> Ontem, o edital saiu.</li>
+                            <li><strong>Explicação (Aposto):</strong> O Brasil, maior país, tem problemas.</li>
+                            <li><strong>Antes do "E":</strong> Só se os sujeitos forem DIFERENTES.</li>
+                        </ul>
+                    </div>
+                </article>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
