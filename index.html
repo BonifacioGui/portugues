@@ -369,6 +369,206 @@
                             <li><strong>Explicação (Aposto):</strong> O Brasil, maior país, tem problemas.</li>
                             <li><strong>Antes do "E":</strong> Só se os sujeitos forem DIFERENTES.</li>
                         </ul>
+                        <div class="mt-8">
+                            <h3 class="text-xs font-bold text-muted uppercase tracking-widest mb-3 px-2">Parte 3: Ortografia & Semântica</h3>
+                            <ul class="space-y-1">
+                                <li><a href="#concordancia" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="shuffle" class="w-4 h-4 text-pink-500"></i> 7. Concordância</a></li>
+                                <li><a href="#acentuacao" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="music" class="w-4 h-4 text-cyan-400"></i> 8. Acentuação</a></li>
+                                <li><a href="#hifen" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="minus" class="w-4 h-4 text-indigo-400"></i> 9. Hífen (Ímãs)</a></li>
+                                <li><a href="#porques" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="help-circle" class="w-4 h-4 text-orange-400"></i> 10. Os Porquês</a></li>
+                                <li><a href="#se-que" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="code" class="w-4 h-4 text-emerald-400"></i> 11. SE e QUE</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </article>
+                            <hr class="border-border">
+
+                <article id="concordancia" class="scroll-mt-24">
+                    <h2 class="font-sans text-3xl font-extrabold text-white mb-6">7. Concordância "Traiçoeira"</h2>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-paper p-6 rounded-xl border border-border">
+                            <h3 class="font-bold text-primary mb-3 font-sans">1. Sujeito Invertido</h3>
+                            <p class="text-sm text-gray-300 mb-3">O verbo obedece ao sujeito, onde quer que ele esteja.</p>
+                            <div class="bg-black/30 p-3 rounded border border-border space-y-2 text-sm">
+                                <p class="text-danger">❌ Falta cinco dias.</p>
+                                <p class="text-success font-bold">✅ Faltam cinco dias.</p>
+                                <p class="text-xs text-muted mt-2 border-t border-gray-700 pt-2">Dica: Pergunte "O QUE?" ao verbo.</p>
+                            </div>
+                        </div>
+                        <div class="bg-paper p-6 rounded-xl border border-border">
+                            <h3 class="font-bold text-warning mb-3 font-sans">2. A Regra da Seta 🏹</h3>
+                            <ul class="space-y-3 text-sm text-gray-300">
+                                <li>
+                                    <strong class="text-white block">Seta aponta para NOME?</strong>
+                                    <span>Varia (Adjetivo).</span><br>
+                                    <em class="text-xs text-muted">"Tomou <strong>meia</strong> garrafa."</em>
+                                </li>
+                                <li>
+                                    <strong class="text-white block">Seta aponta para VERBO/ADJ?</strong>
+                                    <span>Não varia (Advérbio).</span><br>
+                                    <em class="text-xs text-muted">"A garrafa está <strong>meio</strong> aberta."</em>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </article>
+
+                <hr class="border-border">
+
+                <article id="acentuacao" class="scroll-mt-24">
+                    <h2 class="font-sans text-3xl font-extrabold text-white mb-6">8. Acentuação Lógica</h2>
+                    <div class="space-y-6">
+                        <div class="bg-gradient-to-r from-blue-900/20 to-transparent p-6 rounded-xl border-l-4 border-blue-500">
+                            <h3 class="font-bold text-white font-sans text-lg">Regra de Ouro: O Duelo</h3>
+                            <p class="text-gray-300 mt-2">Oxítonas e Paroxítonas são inimigas. O que uma gosta, a outra odeia.</p>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-6 font-sans">
+                            <div class="bg-paper p-6 rounded-xl border border-border relative overflow-hidden">
+                                <div class="absolute top-0 right-0 -mt-2 -mr-2 w-16 h-16 bg-success/20 rounded-full blur-xl"></div>
+                                <h3 class="text-xl font-bold text-success mb-2">Oxítonas (Última)</h3>
+                                <p class="text-xs text-muted mb-4 uppercase tracking-widest">Amam o Básico</p>
+                                <ul class="text-gray-300 space-y-2 text-sm">
+                                    <li>✅ Terminou em <strong>A, E, O, EM, ENS</strong>? → <span class="text-success font-bold">Acentua!</span></li>
+                                    <li class="text-xs text-muted">Ex: Café, Sofá, Armazém.</li>
+                                    <li class="border-t border-border pt-2 mt-2">🚫 Terminou em I ou U? Não acentua (Caju).</li>
+                                </ul>
+                            </div>
+
+                            <div class="bg-paper p-6 rounded-xl border border-border relative overflow-hidden">
+                                <div class="absolute top-0 right-0 -mt-2 -mr-2 w-16 h-16 bg-danger/20 rounded-full blur-xl"></div>
+                                <h3 class="text-xl font-bold text-danger mb-2">Paroxítonas (Penúltima)</h3>
+                                <p class="text-xs text-muted mb-4 uppercase tracking-widest">Odeiam o Básico</p>
+                                <ul class="text-gray-300 space-y-2 text-sm">
+                                    <li>🚫 Terminou em A, E, O, EM? → <span class="text-danger font-bold">NÃO Acentua!</span></li>
+                                    <li class="text-xs text-muted">Ex: Casa, Mesa, Homem.</li>
+                                    <li class="border-t border-border pt-2 mt-2">✅ Resto "estranho" (L, R, N, X, PS, I, U)? Acentua! (Táxi, Vírus).</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <hr class="border-border">
+
+                <article id="hifen" class="scroll-mt-24">
+                    <h2 class="font-sans text-3xl font-extrabold text-white mb-6">9. Hífen: Regra dos Ímãs 🧲</h2>
+                    <div class="grid md:grid-cols-3 gap-4 text-center font-sans">
+                        <div class="bg-paper p-6 rounded-xl border border-border group hover:border-success transition">
+                            <div class="text-3xl mb-3">❤️</div>
+                            <h3 class="font-bold text-white mb-2">Opostos se Atraem</h3>
+                            <p class="text-xs text-muted">Vogais diferentes se unem.</p>
+                            <p class="text-success font-bold mt-2">Autoescola</p>
+                        </div>
+                        <div class="bg-paper p-6 rounded-xl border border-border group hover:border-danger transition">
+                            <div class="text-3xl mb-3">💔</div>
+                            <h3 class="font-bold text-white mb-2">Iguais se Repelem</h3>
+                            <p class="text-xs text-muted">Letras iguais brigam.</p>
+                            <p class="text-danger font-bold mt-2">Micro-ondas</p>
+                        </div>
+                        <div class="bg-paper p-6 rounded-xl border border-border group hover:border-warning transition">
+                            <div class="text-3xl mb-3">👥</div>
+                            <h3 class="font-bold text-white mb-2">R e S Duplicam</h3>
+                            <p class="text-xs text-muted">Vogal + R ou S.</p>
+                            <p class="text-warning font-bold mt-2">Minissaia</p>
+                        </div>
+                    </div>
+                </article>
+
+                <hr class="border-border">
+
+                <article id="porques" class="scroll-mt-24">
+                    <h2 class="font-sans text-3xl font-extrabold text-white mb-6">10. Os 4 Porquês</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-paper p-5 rounded-lg border-l-4 border-primary">
+                            <h3 class="text-lg font-bold text-white">Por que <span class="text-xs font-normal text-muted">(Separado, sem acento)</span></h3>
+                            <p class="text-sm text-gray-300 mt-1">Inicio ou meio. Troca por <strong>"Por qual razão"</strong>.</p>
+                        </div>
+                        <div class="bg-paper p-5 rounded-lg border-l-4 border-warning">
+                            <h3 class="text-lg font-bold text-white">Por quê <span class="text-xs font-normal text-muted">(Separado, com acento)</span></h3>
+                            <p class="text-sm text-gray-300 mt-1">Final da frase. Pontuação dá o chapéu 🎩.</p>
+                        </div>
+                        <div class="bg-paper p-5 rounded-lg border-l-4 border-success">
+                            <h3 class="text-lg font-bold text-white">Porque <span class="text-xs font-normal text-muted">(Junto, sem acento)</span></h3>
+                            <p class="text-sm text-gray-300 mt-1">Resposta / Causa. Troca por <strong>"Pois"</strong>.</p>
+                        </div>
+                        <div class="bg-paper p-5 rounded-lg border-l-4 border-danger">
+                            <h3 class="text-lg font-bold text-white">O Porquê <span class="text-xs font-normal text-muted">(Junto, com acento)</span></h3>
+                            <p class="text-sm text-gray-300 mt-1">Substantivo. Vem com artigo "O". O motivo.</p>
+                        </div>
+                    </div>
+                </article>
+
+                <hr class="border-border">
+
+                <article id="se-que" class="scroll-mt-24">
+                    <h2 class="font-sans text-3xl font-extrabold text-white mb-6">11. Funções do SE e QUE</h2>
+                    <div class="space-y-8">
+                        <div class="bg-paper p-6 rounded-xl border border-border">
+                            <h3 class="font-bold text-purple-400 mb-4 font-sans text-xl">O Pesadelo do "SE"</h3>
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <strong class="text-white block mb-1">P.A. (Partícula Apassivadora)</strong>
+                                    <p class="text-sm text-gray-400 mb-2">Vende-se casa / Vendem-se casas.</p>
+                                    <ul class="text-xs text-gray-500 list-disc pl-4">
+                                        <li>Aceita plural.</li>
+                                        <li>Verbo VTD (Quem vende, vende algo).</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <strong class="text-white block mb-1">I.I.S. (Índice de Indeterminação)</strong>
+                                    <p class="text-sm text-gray-400 mb-2">Precisa-se DE agentes.</p>
+                                    <ul class="text-xs text-gray-500 list-disc pl-4">
+                                        <li>🚫 Trava no singular.</li>
+                                        <li>Tem preposição (VTI).</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-paper p-6 rounded-xl border border-border">
+                            <h3 class="font-bold text-blue-400 mb-4 font-sans text-xl">O "QUE"</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-start gap-3">
+                                    <span class="bg-blue-500/20 text-blue-400 font-bold px-2 py-1 rounded text-xs">PRONOME</span>
+                                    <div>
+                                        <p class="text-white text-sm">Troca por <strong>O QUAL / A QUAL</strong>.</p>
+                                        <p class="text-xs text-muted">"A vaga <em>que</em> eu quero."</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <span class="bg-yellow-500/20 text-yellow-400 font-bold px-2 py-1 rounded text-xs">CONJUNÇÃO</span>
+                                    <div>
+                                        <p class="text-white text-sm">Troca a oração inteira por <strong>ISSO</strong>.</p>
+                                        <p class="text-xs text-muted">"Ele disse <em>que passaria</em>." → "Ele disse ISSO."</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <hr class="border-border">
+
+                <article id="ortografia" class="scroll-mt-24">
+                    <h2 class="font-sans text-3xl font-extrabold text-white mb-6">12. Ortografia FGV</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 font-sans text-center">
+                        <div class="bg-paper p-4 rounded-lg border border-border">
+                            <strong class="text-white block">Paralisação</strong>
+                            <span class="text-xs text-muted">Vem de Parali<strong class="text-primary">S</strong>ia</span>
+                        </div>
+                        <div class="bg-paper p-4 rounded-lg border border-border">
+                            <strong class="text-white block">Sessão</strong>
+                            <span class="text-xs text-muted">Tempo (Se<strong class="text-primary">x</strong>ta-feira)</span>
+                        </div>
+                        <div class="bg-paper p-4 rounded-lg border border-border">
+                            <strong class="text-white block">Seção</strong>
+                            <span class="text-xs text-muted">Corte / Setor</span>
+                        </div>
+                        <div class="bg-paper p-4 rounded-lg border border-border">
+                            <strong class="text-white block">Cessão</strong>
+                            <span class="text-xs text-muted">Ceder / Dar</span>
+                        </div>
                     </div>
                 </article>
 
