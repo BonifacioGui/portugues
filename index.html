@@ -39,39 +39,69 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <style>
-        /* Animação suave para o robô flutuando */
-        .animate-bounce-slow {
-            animation: bounce 3s infinite;
-        }
-        @keyframes bounce {
-            0%, 100% { transform: translateY(-5%);     }
-            50% { transform: translateY(0); }
-        }
+    /* --- CONFIGURAÇÕES GERAIS --- */
+    body { font-size: 17px; line-height: 1.8; }
+    h1, h2, h3, h4, h5, h6 { font-family: 'Montserrat', sans-serif; }
+    
+    [x-cloak] { display: none !important; }
 
-        /* Animação de entrada do modal */
-        .animate-pop-in {
-            animation: popIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        }
-        @keyframes popIn {
-            0% { transform: scale(0.8); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
+    /* Scrollbar customizada */
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-track { background: #121212; }
+    ::-webkit-scrollbar-thumb { background: #333; border-radius: 5px; border: 2px solid #121212; }
+    
+    /* Efeito 3D para Flashcards */
+    .perspective-1000 { perspective: 1000px; }
+    .preserve-3d { transform-style: preserve-3d; }
+    .backface-hidden { backface-visibility: hidden; }
+    .rotate-y-180 { transform: rotateY(180deg); }
 
-/* Esconde coisas do Alpine antes de carregar */
-[x-cloak] { display: none !important; }
-        /* Ajustes finos */
-        body { font-size: 17px; line-height: 1.8; }
-        h1, h2, h3, h4, h5, h6 { font-family: 'Montserrat', sans-serif; }
-        
-        ::-webkit-scrollbar { width: 10px; }
-        ::-webkit-scrollbar-track { background: #121212; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 5px; border: 2px solid #121212; }
-        
-        /* Efeito 3D Flashcards */
-        .perspective-1000 { perspective: 1000px; }
-        .preserve-3d { transform-style: preserve-3d; }
-        .backface-hidden { backface-visibility: hidden; }
-        .rotate-y-180 { transform: rotateY(180deg); }
+    /* --- ANIMAÇÕES DE INTERFACE --- */
+    
+    /* Robô flutuando */
+    .animate-bounce-slow { animation: bounce 3s infinite; }
+    @keyframes bounce {
+        0%, 100% { transform: translateY(-5%); }
+        50% { transform: translateY(0); }
+    }
+
+    /* Entrada padrão de modal */
+    .animate-pop-in { animation: popIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+    @keyframes popIn {
+        0% { transform: scale(0.8); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* --- ANIMAÇÕES DO JOGO (ACERTO/ERRO) --- */
+
+    /* ACERTOU: Gira e Cresce ao mesmo tempo (Gato Feliz) */
+    .animate-spin-grow { animation: spin-and-grow 3s linear infinite; }
+    @keyframes spin-and-grow {
+        0% { transform: rotate(0deg) scale(1); }
+        50% { transform: rotate(180deg) scale(1.15); }
+        100% { transform: rotate(360deg) scale(1.2); }
+    }
+
+    /* ERROU: Gato Julgador (Entrada das trevas + Crescimento) */
+    .animate-judge-entry { animation: judgeFade 2s ease-out forwards; }
+    @keyframes judgeFade {
+        0% { opacity: 0; filter: brightness(0.1) grayscale(100%); }
+        100% { opacity: 1; filter: brightness(1) grayscale(0%); }
+    }
+
+    .animate-grow-judge { animation: slow-grow-only 4s ease-out forwards; }
+    @keyframes slow-grow-only {
+        0% { transform: scale(0.9); }
+        100% { transform: scale(1.1); }
+    }
+
+    /* ERROU: Texto Tremendo Violentamente ("BURRO!") */
+    .animate-shake-violent { animation: shake-violent 0.2s ease-in-out infinite; display: inline-block; }
+    @keyframes shake-violent {
+        0%, 100% { transform: translateX(0) rotate(0deg); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-4px) rotate(-2deg); }
+        20%, 40%, 60%, 80% { transform: translateX(4px) rotate(2deg); }
+    }
     </style>
     <script>
     document.addEventListener('alpine:init', () => {
@@ -120,7 +150,7 @@
                 }
             },
 
-            // Gatilho Principal
+            // Gatilho Principal (CORRIGIDO COM O LUCIDE)
             triggerChallenge() {
                 if (this.questionQueue.length === 0) {
                     this.shuffleDeck(); // Recarrega se acabar
@@ -130,6 +160,11 @@
                 this.answered = false;
                 this.modalState = 'idle';
                 this.showModal = true;
+
+                // Força o Lucide a renderizar os novos ícones (como a mão)
+                setTimeout(() => {
+                    lucide.createIcons();
+                }, 100);
             },
 
             // Processamento da Resposta
@@ -149,6 +184,11 @@
                     this.streak = 0; // Zera o combo
                     this.modalState = 'error';
                 }
+                
+                // Atualiza ícones novamente após a resposta (caso apareçam novos ícones no feedback)
+                setTimeout(() => {
+                    lucide.createIcons();
+                }, 100);
             },
 
             // Retorna classes CSS baseadas no estado
@@ -164,19 +204,19 @@
             }
         }))
     })
-</script>
+    </script>
 </head>
 
 <body class="bg-bg text-text font-serif antialiased" x-data="{ sidebarOpen: false }">        
         <div x-data="examSystem" class="fixed z-50 bottom-6 right-6 font-sans">
-            
+    
             <div class="relative group">
                 <div class="absolute bottom-full right-0 mb-2 w-48 bg-paper border border-primary/50 text-xs p-2 rounded-lg shadow-lg pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" x-show="!showModal">
-                    Clique para testar seus conhecimentos!
+                    Clique para desafiar a FGV!
                 </div>
                 
                 <button @click="triggerChallenge()" class="bg-primary hover:bg-primary/80 text-white p-4 rounded-full shadow-lg shadow-primary/20 transition-all hover:scale-110 active:scale-95 flex items-center justify-center animate-bounce-slow border border-white/10">
-                    <i data-lucide="gamepad-2" class="w-8 h-8"></i>
+                    <i data-lucide="bot" class="w-8 h-8"></i>
                     <span class="absolute -top-2 -left-2 bg-danger text-white text-[10px] font-black w-6 h-6 flex items-center justify-center rounded-full border-2 border-bg" x-text="streak" x-show="streak > 0"></span>
                 </button>
             </div>
@@ -193,7 +233,7 @@
                                 <i :data-lucide="answered ? (isCorrect ? 'check-circle' : 'alert-triangle') : 'cpu'" class="w-5 h-5"></i>
                             </div>
                             <div>
-                                <h3 class="font-black text-white text-lg tracking-tight" x-text="answered ? (isCorrect ? 'RESPOSTA CORRETA' : 'ERRO DE SINTAXE') : 'NOVO DESAFIO'"></h3>
+                                <h3 class="font-black text-white text-lg tracking-tight" x-text="answered ? (isCorrect ? 'RESPOSTA CORRETA' : 'RESPOSTA INCORRETA') : 'NOVO DESAFIO'"></h3>
                                 <p class="text-[10px] font-mono text-slate-500 uppercase tracking-widest" x-text="currentQ.category"></p>
                             </div>
                         </div>
@@ -204,11 +244,59 @@
                         </div>
                     </div>
 
-                    <div class="p-8 text-center">
-                        <p class="text-xl font-medium text-slate-200 leading-relaxed" x-text="currentQ.q"></p>
+                    <div class="p-8 text-center relative overflow-hidden min-h-[360px] flex flex-col justify-center">
+    
+                        <div x-show="answered && isCorrect" 
+                            class="absolute inset-0 flex flex-col items-center justify-center bg-black/90 z-20 p-4"
+                            x-transition:enter="transition ease-out duration-500"
+                            x-transition:enter-start="opacity-0 scale-50"
+                            x-transition:enter-end="opacity-100 scale-100">
+                            
+                            <div class="relative my-15">
+                                <div class="absolute inset-0 rounded-full bg-emerald-500 blur-2xl opacity-60 animate-pulse scale-125"></div>
+                                <video 
+                                    src="endeota.mp4" 
+                                    autoplay 
+                                    muted 
+                                    playsinline 
+                                    class="relative z-20 w-80 h-80 object-cover rounded-full border-2 border-success shadow-2xl"
+                                ></video>
+                            </div>
+                            <p class="text-emerald-200 text-lg mt-2 font-mono font-bold relative z-20">+10 PONTOS</p>
+                        </div>
+
+
+                        <div x-show="answered && !isCorrect" 
+                            class="absolute inset-0 flex flex-col items-center justify-center bg-black/95 z-20 overflow-hidden pt-4">
+                            
+                            <div class="animate-judge-entry relative mb-2 flex-shrink-0">
+                                <div class="absolute inset-0 rounded-full bg-danger blur-[80px] opacity-30 animate-pulse"></div>
+                                <img src="endeota2.jpg" 
+                                    class="w-40 h-40 rounded-full border-4 border-rose-900 shadow-2xl relative z-10 object-cover contrast-125 animate-grow-judge" 
+                                    alt="Gato Julgador">
+                            </div>
+
+                            <div class="flex flex-col items-center animate-pop-in relative z-30" style="animation-delay: 0.5s; animation-fill-mode: both;">
+                                
+                                <div class="animate-bounce -mb-4 z-40 relative">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="currentColor" class="text-rose-600 filter drop-shadow-[0_0_15px_rgba(225,29,72,1)] rotate-12">
+                                        <path d="M10 16.5l6-4.5-6-4.5v9zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.5 17h-1v-8h1v8zm-.5-10c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z" opacity="0"/> 
+                                        <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z" fill="none"/>
+                                        <path d="M17 14l-5 5-5-5h3V9h4v5h3z"/> 
+                                    </svg>
+                                </div>
+
+                                <div class="mt-4 text-center">
+                                    <h2 class="text-6xl font-black text-rose-600 uppercase tracking-tighter leading-none font-sans drop-shadow-2xl animate-shake-violent">
+                                        BURRO!
+                                    </h2>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p class="text-xl font-medium text-slate-200 leading-relaxed relative z-10 px-4" x-text="currentQ.q"></p>
                         
-                        <div x-show="answered" x-transition class="mt-6 p-4 rounded-xl text-sm font-medium border text-left"
-                            :class="isCorrect ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-300' : 'bg-rose-500/5 border-rose-500/20 text-rose-300'">
+                        <div x-show="answered" class="mt-6 p-4 rounded-xl text-sm font-medium border text-left relative z-10 opacity-0">
                             <p x-text="currentQ.expl"></p>
                         </div>
                     </div>
@@ -222,7 +310,7 @@
                         </button>
                     </div>
 
-                    <div class="p-6 bg-black/20 border-t border-white/5" x-show="answered">
+                    <div class="p-6 bg-black/20 border-t border-white/5 relative z-30" x-show="answered">
                         <button @click="triggerChallenge()" class="w-full py-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-black tracking-widest uppercase shadow-lg shadow-blue-900/20 transition-all flex items-center justify-center gap-2">
                             Próximo Nível <i data-lucide="arrow-right" class="w-5 h-5"></i>
                         </button>
@@ -231,7 +319,6 @@
                     <div class="absolute top-2 left-1/2 -translate-x-1/2" x-show="streak > 1 && !answered">
                         <span class="text-[10px] font-black text-amber-500 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20 animate-pulse" x-text="getStreakLabel()"></span>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -277,6 +364,14 @@
                         <li><a href="#ortografia" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="type" class="w-4 h-4 text-violet-400"></i> 12. Ortografia</a></li>
                         <li><a href="#regencia-fina" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="crosshair" class="w-4 h-4 text-rose-400"></i> 13. Regência Fina</a></li>
                         <li><a href="#glossario" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="book-open" class="w-4 h-4 text-teal-400"></i> 14. Glossário FGV</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-xs font-bold text-muted uppercase tracking-widest mb-3 px-2">Parte 4: A Lógica FGV (Ouro)</h3>
+                    <ul class="space-y-1">
+                        <li><a href="#interpretacao" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="search" class="w-4 h-4 text-sky-400"></i> 15. Interpretação</a></li>
+                        <li><a href="#subjetividade" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="eye" class="w-4 h-4 text-pink-400"></i> 16. Opinião x Fato</a></li>
+                        <li><a href="#ambiguidade" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="split" class="w-4 h-4 text-orange-400"></i> 17. Ambiguidade</a></li>
                     </ul>
                 </div>
             </nav>
@@ -2068,6 +2163,102 @@
                             </div>
                         </div>
 
+                    </div>
+                </article>
+                <hr class="border-border">
+
+                <article id="interpretacao" class="scroll-mt-24">
+                    <header class="mb-6">
+                        <span class="font-sans text-xs font-bold text-primary tracking-widest uppercase mb-2 block">Assunto Nº 1 da Prova</span>
+                        <h2 class="font-sans text-3xl font-extrabold text-white mb-2">15. Interpretação Cirúrgica</h2>
+                    </header>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-paper p-6 rounded-xl border border-border">
+                            <h3 class="font-bold text-white mb-4 font-sans flex items-center gap-2"><i data-lucide="target" class="text-primary"></i> O Método de Ataque</h3>
+                            <ul class="space-y-4 text-sm text-gray-300">
+                                <li class="bg-black/20 p-3 rounded border border-border/50">
+                                    <strong class="text-white block mb-1">1. Comando Primeiro</strong>
+                                    Leia a pergunta ANTES do texto. A FGV cansa você. Vá direto ao que ela quer (ideia central? um detalhe? tom do autor?).
+                                </li>
+                                <li class="bg-black/20 p-3 rounded border border-border/50">
+                                    <strong class="text-white block mb-1">2. O "Título" Escondido</strong>
+                                    O primeiro parágrafo (Tópico Frasal) geralmente contém a <strong>Tese</strong>. O resto é enrolação/exemplo.
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-paper p-6 rounded-xl border border-border">
+                            <h3 class="font-bold text-white mb-4 font-sans flex items-center gap-2"><i data-lucide="alert-octagon" class="text-danger"></i> Os 3 Erros FGV</h3>
+                            <div class="space-y-3 text-sm">
+                                <div class="flex gap-3">
+                                    <span class="text-danger font-bold">Extrapolação</span>
+                                    <span class="text-muted">Viajar na maionese. Dizer o que o texto não disse.</span>
+                                </div>
+                                <div class="flex gap-3">
+                                    <span class="text-warning font-bold">Redução</span>
+                                    <span class="text-muted">Focar num detalhe (exemplo) e dizer que é a ideia principal.</span>
+                                </div>
+                                <div class="flex gap-3">
+                                    <span class="text-success font-bold">Contradição</span>
+                                    <span class="text-muted">Concluir o oposto do autor. (Cuidado com a ironia!).</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <hr class="border-border">
+
+                <article id="subjetividade" class="scroll-mt-24">
+                    <h2 class="font-sans text-3xl font-extrabold text-white mb-6">16. Opinião vs. Fato</h2>
+                    <p class="text-muted mb-6">A FGV pede: "Qual frase mostra a visão do autor?". O segredo está nos adjetivos e advérbios.</p>
+
+                    <div class="grid md:grid-cols-2 gap-6 font-sans">
+                        <div class="bg-paper p-6 rounded-xl border-l-4 border-primary">
+                            <h3 class="text-xl font-bold text-white mb-2">📸 Fato (Objetivo)</h3>
+                            <p class="text-xs text-muted mb-4 uppercase tracking-widest">Linguagem Denotativa</p>
+                            <p class="text-white text-lg">"O prédio é <span class="text-primary font-bold">alto</span>."</p>
+                            <p class="text-gray-400 text-sm mt-2">É mensurável. Ninguém discorda.</p>
+                        </div>
+
+                        <div class="bg-paper p-6 rounded-xl border-l-4 border-pink-500">
+                            <h3 class="text-xl font-bold text-white mb-2">🧠 Opinião (Subjetivo)</h3>
+                            <p class="text-xs text-muted mb-4 uppercase tracking-widest">Linguagem Conotativa/Valorativa</p>
+                            <p class="text-white text-lg">"O prédio é <span class="text-pink-500 font-bold">imponente</span>."</p>
+                            <p class="text-gray-400 text-sm mt-2">Juízo de valor. "Imponente" é opinião do autor.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-sm text-yellow-200">
+                        <strong>💡 Dica Ninja:</strong> Procure por advérbios de modo ("Infelizmente", "Brilhantemente") ou adjetivos que não são físicos ("Absurdo", "Magnífico"). Eles entregam a opinião.
+                    </div>
+                </article>
+
+                <hr class="border-border">
+
+                <article id="ambiguidade" class="scroll-mt-24">
+                    <h2 class="font-sans text-3xl font-extrabold text-white mb-6">17. Ambiguidade (Duplo Sentido)</h2>
+                    <div class="bg-paper p-6 rounded-xl border border-border">
+                        <div class="grid gap-4">
+                            <div class="flex flex-col md:flex-row gap-4 items-center bg-black/30 p-4 rounded-lg">
+                                <div class="text-danger font-bold text-lg min-w-[80px] text-center">O ERRO</div>
+                                <div class="flex-1">
+                                    <p class="text-white italic">"O policial prendeu o ladrão em <strong class="text-danger">sua</strong> casa."</p>
+                                    <p class="text-muted text-xs mt-1">Casa de quem? Do policial ou do ladrão?</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-center text-muted"><i data-lucide="arrow-down" class="w-6 h-6"></i></div>
+
+                            <div class="flex flex-col md:flex-row gap-4 items-center bg-success/10 border border-success/30 p-4 rounded-lg">
+                                <div class="text-success font-bold text-lg min-w-[80px] text-center">A CURA</div>
+                                <div class="flex-1">
+                                    <p class="text-white">Use pronomes "dele/dela" ou repita o nome.</p>
+                                    <p class="text-success italic mt-1">"O policial prendeu o ladrão na casa <strong class="underline">deste</strong>."</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </article>
             </div>  </main>
