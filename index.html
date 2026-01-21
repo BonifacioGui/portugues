@@ -39,6 +39,26 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <style>
+        /* Animação suave para o robô flutuando */
+        .animate-bounce-slow {
+            animation: bounce 3s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(-5%);     }
+            50% { transform: translateY(0); }
+        }
+
+        /* Animação de entrada do modal */
+        .animate-pop-in {
+            animation: popIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+/* Esconde coisas do Alpine antes de carregar */
+[x-cloak] { display: none !important; }
         /* Ajustes finos */
         body { font-size: 17px; line-height: 1.8; }
         h1, h2, h3, h4, h5, h6 { font-family: 'Montserrat', sans-serif; }
@@ -53,11 +73,170 @@
         .backface-hidden { backface-visibility: hidden; }
         .rotate-y-180 { transform: rotateY(180deg); }
     </style>
+    <script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('examSystem', () => ({
+            // Estado do Sistema
+            score: 0,
+            streak: 0,
+            highScore: 0,
+            
+            // Controle da Interface
+            showModal: false,
+            answered: false,
+            isCorrect: false,
+            modalState: 'idle', // idle, success, error
+            
+            // Dados da Questão Atual
+            currentQ: { q: "", a: false, expl: "", category: "" },
+            
+            // Sistema de Deck (Para não repetir perguntas)
+            questionQueue: [],
+            
+            // Banco de Dados (Expandido e Categorizado)
+            db: [
+                { q: "Em 'Entreguei o relatório à diretora', a crase ocorre pelo teste do 'AO'.", a: true, expl: "Correto. Troca-se por masculino: Entreguei AO diretor.", category: "Crase" },
+                { q: "A frase 'Vou a Roma' exige crase pois é um destino específico.", a: false, expl: "Erro de Compilação. Quem vai a e volta de, crase pra quê?", category: "Crase" },
+                { q: "A regra M.V.P. proíbe crase antes de Masculino, Verbo e Plural genérico.", a: true, expl: "Protocolo de Segurança Ativo. Zona Vermelha respeitada.", category: "Crase" },
+                { q: "O conectivo 'Mas' pode ser substituído por 'Embora' sem alterar o sentido.", a: false, expl: "Falha Lógica. 'Mas' é Oposição (Adversativa). 'Embora' é Concessão.", category: "Conectivos" },
+                { q: "Na voz passiva, o verbo 'SER' copia o tempo verbal da voz ativa.", a: true, expl: "Sincronização efetuada. O auxiliar imita o tempo original.", category: "Vozes" },
+                { q: "Vírgula entre Sujeito e Verbo é permitida em frases longas.", a: false, expl: "Erro Crítico (S.V.C). Sujeito e Verbo nunca se separam.", category: "Pontuação" },
+                { q: "A palavra 'Item' leva acento por ser paroxítona.", a: false, expl: "Negativo. Paroxítonas terminadas em EM/ENS não levam acento.", category: "Acentuação" },
+                { q: "Na frase 'Falta cinco dias', a concordância está correta.", a: false, expl: "Bug de Concordância. O sujeito é 'cinco dias' (plural), logo: 'Faltam'.", category: "Sintaxe" },
+                { q: "O hífen é usado em 'Micro-ondas' porque letras iguais se repelem.", a: true, expl: "Física da Ortografia correta. Vogais iguais exigem separação.", category: "Hífen" },
+                { q: "O pronome 'QUE' pode ser substituído por 'O QUAL' quando é Relativo.", a: true, expl: "Ponteiro verificado. Ele retoma o termo anterior.", category: "Pronomes" }
+            ],
+
+            init() {
+                this.shuffleDeck();
+            },
+
+            // Algoritmo de Embaralhamento (Fisher-Yates)
+            shuffleDeck() {
+                this.questionQueue = [...this.db];
+                for (let i = this.questionQueue.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [this.questionQueue[i], this.questionQueue[j]] = [this.questionQueue[j], this.questionQueue[i]];
+                }
+            },
+
+            // Gatilho Principal
+            triggerChallenge() {
+                if (this.questionQueue.length === 0) {
+                    this.shuffleDeck(); // Recarrega se acabar
+                }
+                
+                this.currentQ = this.questionQueue.pop();
+                this.answered = false;
+                this.modalState = 'idle';
+                this.showModal = true;
+            },
+
+            // Processamento da Resposta
+            submitAnswer(userBool) {
+                if (this.answered) return; // Bloqueia duplo clique
+
+                this.answered = true;
+                this.isCorrect = (userBool === this.currentQ.a);
+
+                if (this.isCorrect) {
+                    this.streak++;
+                    const comboBonus = this.streak > 2 ? 5 : 0;
+                    this.score += (10 + comboBonus);
+                    this.modalState = 'success';
+                    if (this.score > this.highScore) this.highScore = this.score;
+                } else {
+                    this.streak = 0; // Zera o combo
+                    this.modalState = 'error';
+                }
+            },
+
+            // Retorna classes CSS baseadas no estado
+            getStatusColor() {
+                if (!this.answered) return 'border-white/10';
+                return this.isCorrect ? 'border-emerald-500 shadow-[0_0_30px_rgba(16,185,129,0.2)]' : 'border-rose-500 shadow-[0_0_30px_rgba(244,63,94,0.2)]';
+            },
+            
+            getStreakLabel() {
+                if (this.streak > 4) return "SYSTEM OVERLOAD 🔥";
+                if (this.streak > 2) return "COMBO ATIVO ⚡";
+                return "";
+            }
+        }))
+    })
+</script>
 </head>
 
-<body class="bg-bg text-text font-serif antialiased" x-data="{ sidebarOpen: false }">
+<body class="bg-bg text-text font-serif antialiased" x-data="{ sidebarOpen: false }">        
+        <div x-data="examSystem" class="fixed z-50 bottom-6 right-6 font-sans">
+            
+            <div class="relative group">
+                <div class="absolute bottom-full right-0 mb-2 w-48 bg-paper border border-primary/50 text-xs p-2 rounded-lg shadow-lg pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" x-show="!showModal">
+                    Clique para testar seus conhecimentos!
+                </div>
+                
+                <button @click="triggerChallenge()" class="bg-primary hover:bg-primary/80 text-white p-4 rounded-full shadow-lg shadow-primary/20 transition-all hover:scale-110 active:scale-95 flex items-center justify-center animate-bounce-slow border border-white/10">
+                    <i data-lucide="gamepad-2" class="w-8 h-8"></i>
+                    <span class="absolute -top-2 -left-2 bg-danger text-white text-[10px] font-black w-6 h-6 flex items-center justify-center rounded-full border-2 border-bg" x-text="streak" x-show="streak > 0"></span>
+                </button>
+            </div>
 
-    <div class="lg:hidden fixed top-0 w-full z-50 bg-paper/95 backdrop-blur border-b border-border px-4 py-3 flex items-center justify-between shadow-md">
+            <div x-show="showModal" x-cloak class="fixed inset-0 z-[60] flex items-center justify-center p-4">
+                <div class="absolute inset-0 bg-black/90 backdrop-blur-sm" @click="if(answered) showModal = false" x-transition.opacity></div>
+                
+                <div class="relative bg-[#1a1d24] w-full max-w-lg rounded-[2rem] border-2 overflow-hidden shadow-2xl animate-pop-in"
+                    :class="getStatusColor()">
+
+                    <div class="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 rounded-lg transition-colors" :class="answered ? (isCorrect ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500') : 'bg-blue-500/10 text-blue-500'">
+                                <i :data-lucide="answered ? (isCorrect ? 'check-circle' : 'alert-triangle') : 'cpu'" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-black text-white text-lg tracking-tight" x-text="answered ? (isCorrect ? 'RESPOSTA CORRETA' : 'ERRO DE SINTAXE') : 'NOVO DESAFIO'"></h3>
+                                <p class="text-[10px] font-mono text-slate-500 uppercase tracking-widest" x-text="currentQ.category"></p>
+                            </div>
+                        </div>
+                        
+                        <div class="text-right">
+                            <p class="text-[10px] text-slate-500 uppercase font-bold">XP Total</p>
+                            <p class="text-xl font-black text-white font-mono" x-text="score"></p>
+                        </div>
+                    </div>
+
+                    <div class="p-8 text-center">
+                        <p class="text-xl font-medium text-slate-200 leading-relaxed" x-text="currentQ.q"></p>
+                        
+                        <div x-show="answered" x-transition class="mt-6 p-4 rounded-xl text-sm font-medium border text-left"
+                            :class="isCorrect ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-300' : 'bg-rose-500/5 border-rose-500/20 text-rose-300'">
+                            <p x-text="currentQ.expl"></p>
+                        </div>
+                    </div>
+
+                    <div class="p-6 bg-black/20 border-t border-white/5 grid grid-cols-2 gap-4" x-show="!answered">
+                        <button @click="submitAnswer(true)" class="py-4 rounded-xl bg-white/5 hover:bg-emerald-500/20 border border-white/10 hover:border-emerald-500/50 text-white font-bold transition-all flex items-center justify-center gap-2 group">
+                            <i data-lucide="thumbs-up" class="w-5 h-5 group-hover:text-emerald-400"></i> Verdadeiro
+                        </button>
+                        <button @click="submitAnswer(false)" class="py-4 rounded-xl bg-white/5 hover:bg-rose-500/20 border border-white/10 hover:border-rose-500/50 text-white font-bold transition-all flex items-center justify-center gap-2 group">
+                            <i data-lucide="thumbs-down" class="w-5 h-5 group-hover:text-rose-400"></i> Falso
+                        </button>
+                    </div>
+
+                    <div class="p-6 bg-black/20 border-t border-white/5" x-show="answered">
+                        <button @click="triggerChallenge()" class="w-full py-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-black tracking-widest uppercase shadow-lg shadow-blue-900/20 transition-all flex items-center justify-center gap-2">
+                            Próximo Nível <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+
+                    <div class="absolute top-2 left-1/2 -translate-x-1/2" x-show="streak > 1 && !answered">
+                        <span class="text-[10px] font-black text-amber-500 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20 animate-pulse" x-text="getStreakLabel()"></span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    <div class="lg:hidden fixed top-0...w-full z-50 bg-paper/95 backdrop-blur border-b border-border px-4 py-3 flex items-center justify-between shadow-md">
         <span class="font-sans font-bold text-lg tracking-tight text-white">Manual FGV</span>
         <button @click="sidebarOpen = !sidebarOpen" class="p-2 text-muted hover:text-white"><i data-lucide="menu"></i></button>
     </div>
@@ -87,460 +266,751 @@
                         <li><a href="#pontuacao" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="alert-circle" class="w-4 h-4 text-red-500"></i> 6. Pontuação</a></li>
                     </ul>
                 </div>
+                <div>
+                    <h3 class="text-xs font-bold text-muted uppercase tracking-widest mb-3 px-2">Parte 3: Ortografia & Semântica</h3>
+                    <ul class="space-y-1">
+                        <li><a href="#concordancia" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="shuffle" class="w-4 h-4 text-pink-500"></i> 7. Concordância</a></li>
+                        <li><a href="#acentuacao" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="music" class="w-4 h-4 text-cyan-400"></i> 8. Acentuação</a></li>
+                        <li><a href="#hifen" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="minus" class="w-4 h-4 text-indigo-400"></i> 9. Hífen (Ímãs)</a></li>
+                        <li><a href="#porques" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="help-circle" class="w-4 h-4 text-orange-400"></i> 10. Os Porquês</a></li>
+                        <li><a href="#se-que" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="code" class="w-4 h-4 text-emerald-400"></i> 11. SE e QUE</a></li>
+                        <li><a href="#ortografia" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="type" class="w-4 h-4 text-violet-400"></i> 12. Ortografia</a></li>
+                        <li><a href="#regencia-fina" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="crosshair" class="w-4 h-4 text-rose-400"></i> 13. Regência Fina</a></li>
+                        <li><a href="#glossario" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="book-open" class="w-4 h-4 text-teal-400"></i> 14. Glossário FGV</a></li>
+                    </ul>
+                </div>
             </nav>
         </aside>
 
         <main class="flex-1 overflow-y-auto relative w-full bg-bg scroll-smooth">
             <div class="max-w-4xl mx-auto px-6 py-12 lg:py-20 space-y-32 pb-40">
 
-                <article id="crase" class="scroll-mt-24">
-                    <header class="mb-8 border-b border-border pb-6">
-                        <span class="font-sans text-xs font-bold text-primary tracking-widest uppercase mb-2 block">Alta Incidência</span>
-                        <h2 class="text-4xl font-extrabold text-white mb-2">1. Crase: Resumo Completo</h2>
-                        <p class="text-muted">A fusão de A + A. Palavras-chave para memorização.</p>
+                <article id="crase" class="scroll-mt-32 max-w-5xl mx-auto p-8 bg-[#0f1115] text-slate-100 font-sans rounded-[2rem] shadow-2xl border border-white/10 relative overflow-hidden">
+    
+                    <div class="absolute top-0 right-0 px-6 py-2 bg-rose-600 text-white text-[11px] font-black uppercase tracking-[0.2em] rounded-bl-2xl shadow-lg z-20">
+                        Prioridade: Alta Incidência (FGV)
+                    </div>
+
+                    <header class="mb-12">
+                        <h2 class="text-5xl font-black text-white mb-4 tracking-tight">1. Crase</h2>
+                        <p class="text-xl text-slate-300 font-medium">O guia definitivo da fusão: <span class="text-blue-400 font-bold italic">Preposição A</span> + <span class="text-blue-400 font-bold italic">Artigo A</span>.</p>
+                        <div class="h-1.5 w-24 bg-blue-600 mt-4 rounded-full"></div>
                     </header>
 
-                    <div class="space-y-8">
-                        <div class="bg-paper p-6 rounded-xl border border-border">
-                            <h3 class="text-xl font-bold text-white mb-4 font-sans">🔑 Fórmula Básica</h3>
-                            <div class="space-y-2 text-sm text-gray-300">
-                                <p>Crase = Preposição "a" + Artigo "a" = <strong>à</strong></p>
-                                <p>Crase = Preposição "a" + Pronome "aquela" = <strong>àquela</strong></p>
-                            </div>
-                        </div>
-
-                        <div class="space-y-4">
-                            <h3 class="text-2xl font-bold text-success font-sans flex items-center gap-2"><i data-lucide="check-circle"></i> Zona Verde (Use)</h3>
-                            <div class="grid gap-4">
-                                <div class="bg-paper p-5 rounded-lg border-l-4 border-success">
-                                    <strong class="text-white block font-sans text-lg">1. Palavra Feminina (Teste do AO)</strong>
-                                    <p class="text-gray-300 mt-1">Frase: <em>Entreguei à diretora.</em></p>
-                                    <p class="text-gray-300">Teste: <em>Entreguei <strong>AO</strong> diretor.</em></p>
-                                    <p class="text-success font-bold mt-1">✅ Virou AO? → TEM crase.</p>
-                                </div>
-                                <div class="bg-paper p-5 rounded-lg border-l-4 border-success">
-                                    <strong class="text-white block font-sans text-lg">2. Verbos de Destino</strong>
-                                    <p class="text-gray-300 mt-1 font-mono text-sm bg-black/30 p-2 rounded inline-block">
-                                        Vou a, volto DA → crase HÁ.<br>
-                                        Vou a, volto DE → crase pra QUÊ.
-                                    </p>
-                                    <p class="text-xs text-muted mt-2">Ex: À Bahia (Volto da), A Roma (Volto de).</p>
-                                </div>
-                                <div class="bg-paper p-5 rounded-lg border-l-4 border-success">
-                                    <strong class="text-white block font-sans text-lg">3. Locuções Femininas</strong>
-                                    <p class="text-gray-300">Tempo, Modo, Lugar. Se tirar a crase, "soa errado".</p>
-                                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2 mt-3 text-sm text-muted">
-                                        <span>• À noite</span>
-                                        <span>• Às pressas</span>
-                                        <span>• À direita</span>
-                                        <span>• À medida que</span>
-                                        <span>• À procura de</span>
-                                        <span>• À espera de</span>
+                    <div class="space-y-12">
+                        
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div class="bg-slate-900 p-8 rounded-[2rem] border border-white/10 shadow-inner">
+                                <h3 class="text-blue-400 text-xs font-bold mb-6 uppercase tracking-[0.2em]">
+                                    <i data-lucide="binary" class="w-4 h-4 inline mr-2"></i> A Matemática
+                                </h3>
+                                <div class="space-y-4 font-mono">
+                                    <div class="flex items-center gap-4 bg-black/50 p-5 rounded-2xl border border-white/5">
+                                        <span class="text-slate-300 text-lg">A + A</span>
+                                        <i data-lucide="move-right" class="w-5 h-5 text-blue-500/50"></i>
+                                        <span class="text-3xl font-black text-white">À</span>
+                                    </div>
+                                    <div class="flex items-center gap-4 bg-black/50 p-5 rounded-2xl border border-white/5">
+                                        <span class="text-slate-300 text-lg">A + Aquela</span>
+                                        <i data-lucide="move-right" class="w-5 h-5 text-blue-500/50"></i>
+                                        <span class="text-3xl font-black text-white">Àquela</span>
                                     </div>
                                 </div>
-                                <div class="bg-paper p-5 rounded-lg border-l-4 border-success">
-                                    <strong class="text-white block font-sans text-lg">4. Horas e "Moda de"</strong>
-                                    <p class="text-gray-300">Horas exatas: <em>Às 14h.</em></p>
-                                    <p class="text-gray-300">Moda de (mesmo oculto): <em>Gol à Pelé, Bife à milanesa.</em></p>
+                            </div>
+
+                            <div class="bg-slate-900 p-8 rounded-[2rem] border border-emerald-500/20 flex flex-col justify-center text-center">
+                                <h3 class="text-emerald-400 text-xs font-bold mb-4 uppercase tracking-[0.2em]">O Teste de Ouro</h3>
+                                <p class="text-sm text-slate-300 mb-6 italic">Troque a palavra feminina por uma masculina:</p>
+                                <div class="space-y-3">
+                                    <p class="text-2xl font-bold tracking-tight text-white">"Fui <span class="text-emerald-400 underline decoration-4 underline-offset-8">à</span> feira"</p>
+                                    <div class="flex justify-center opacity-40 py-1">
+                                        <i data-lucide="arrow-down-up" class="w-6 h-6 text-white"></i>
+                                    </div>
+                                    <p class="text-2xl font-bold text-slate-200">"Fui <span class="text-emerald-400">AO</span> mercado"</p>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="space-y-4">
-                            <h3 class="text-2xl font-bold text-danger font-sans flex items-center gap-2"><i data-lucide="ban"></i> Zona Vermelha (M.V.P.)</h3>
-                            <div class="bg-danger/5 border border-danger/30 p-6 rounded-xl">
-                                <ul class="space-y-4 text-gray-300">
-                                    <li>🚫 <strong>M — Masculino:</strong> <em>A pé, A prazo, A cavalo, A lápis.</em></li>
-                                    <li>🚫 <strong>V — Verbo:</strong> <em>A partir, A cantar, A estudar.</em> ("Diante de verbo, crase não acerto").</li>
-                                    <li>🚫 <strong>P — Plural:</strong> "A" (singular) + Palavra no plural. <em>(Refiro-me a pessoas).</em></li>
-                                    <li>🚫 <strong>Pronomes Pessoais:</strong> <em>A ela, A mim, A ti.</em></li>
+                        <section class="space-y-6">
+                            <h3 class="text-2xl font-black text-white flex items-center gap-3">
+                                <span class="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.6)]"></span>
+                                Zona Verde: Use Sempre
+                            </h3>
+                            <div class="grid md:grid-cols-3 gap-6">
+                                <div class="p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-emerald-500/50 transition-colors">
+                                    <strong class="text-emerald-400 block text-xs uppercase mb-4 tracking-widest">Locuções Femininas</strong>
+                                    <div class="flex flex-col gap-2 text-sm font-bold text-slate-100">
+                                        <span class="flex items-center gap-2"><div class="w-1 h-1 bg-emerald-500 rounded-full"></div> À noite</span>
+                                        <span class="flex items-center gap-2"><div class="w-1 h-1 bg-emerald-500 rounded-full"></div> Às pressas</span>
+                                        <span class="flex items-center gap-2"><div class="w-1 h-1 bg-emerald-500 rounded-full"></div> À direita</span>
+                                    </div>
+                                </div>
+                                <div class="p-6 rounded-2xl bg-white/5 border border-white/10">
+                                    <strong class="text-emerald-400 block text-xs uppercase mb-4 tracking-widest">Horas Exatas</strong>
+                                    <p class="text-xl font-bold text-white">Às 14h</p>
+                                    <p class="text-xs text-slate-400 mt-2">Indicação de horas exatas sempre recebe crase.</p>
+                                </div>
+                                <div class="p-6 rounded-2xl bg-white/5 border border-white/10">
+                                    <strong class="text-emerald-400 block text-xs uppercase mb-4 tracking-widest">Verbos de Destino</strong>
+                                    <div class="bg-black/30 p-3 rounded-xl border border-white/5">
+                                        <p class="text-sm font-mono text-emerald-300">Vou a, volto <span class="underline">DA</span>:</p>
+                                        <p class="text-lg font-black text-white mt-1">Crase HÁ!</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="space-y-6">
+                            <h3 class="text-2xl font-black text-white flex items-center gap-3">
+                                <span class="w-3 h-3 rounded-full bg-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.6)]"></span>
+                                Zona Vermelha: Proibido
+                            </h3>
+                            <div class="bg-black/60 border border-white/10 rounded-[2.5rem] p-12">
+                                <div class="grid md:grid-cols-3 gap-12 text-center">
+                                    <div class="group">
+                                        <div class="text-7xl font-black text-rose-500 mb-2 drop-shadow-[0_0_10px_rgba(244,63,94,0.3)]">M</div>
+                                        <p class="text-sm font-bold uppercase tracking-[0.2em] text-white">Masculino</p>
+                                        <p class="text-xs text-slate-400 mt-3 italic bg-white/5 py-2 rounded-lg">A pé, A prazo, A cavalo</p>
+                                    </div>
+                                    <div class="group">
+                                        <div class="text-7xl font-black text-rose-500 mb-2 drop-shadow-[0_0_10px_rgba(244,63,94,0.3)]">V</div>
+                                        <p class="text-sm font-bold uppercase tracking-[0.2em] text-white">Verbos</p>
+                                        <p class="text-xs text-slate-400 mt-3 italic bg-white/5 py-2 rounded-lg">A partir de, A cantar</p>
+                                    </div>
+                                    <div class="group">
+                                        <div class="text-7xl font-black text-rose-500 mb-2 drop-shadow-[0_0_10px_rgba(244,63,94,0.3)]">P</div>
+                                        <p class="text-sm font-bold uppercase tracking-[0.2em] text-white">Plural</p>
+                                        <p class="text-xs text-slate-400 mt-3 italic bg-white/5 py-2 rounded-lg">A (singular) + Plural</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div class="p-8 rounded-[2rem] bg-white/5 border border-white/10">
+                                <h4 class="text-amber-400 text-xs font-bold uppercase tracking-widest mb-6 flex items-center gap-3">
+                                    <i data-lucide="help-circle" class="w-5 h-5"></i> Facultativas (Tanto faz)
+                                </h4>
+                                <ul class="space-y-4 text-sm text-slate-200">
+                                    <li class="flex items-center gap-3"><div class="w-1.5 h-1.5 bg-amber-500 rounded-full"></div> Nomes próprios femininos</li>
+                                    <li class="flex items-center gap-3"><div class="w-1.5 h-1.5 bg-amber-500 rounded-full"></div> Pronomes possessivos femininos</li>
+                                    <li class="flex items-center gap-3"><div class="w-1.5 h-1.5 bg-amber-500 rounded-full"></div> Depois da preposição "ATÉ"</li>
                                 </ul>
                             </div>
-                        </div>
 
-                        <div class="bg-paper border border-warning/30 p-6 rounded-xl">
-                            <h3 class="text-warning font-bold font-sans mb-2">⚠️ Facultativa (Tanto faz)</h3>
-                            <ul class="list-disc pl-5 space-y-1 text-gray-300">
-                                <li>Nome de mulher (A / À Maria).</li>
-                                <li>Pronome possessivo feminino (A / À minha).</li>
-                                <li>Depois de "Até" (Até a / Até à porta).</li>
-                            </ul>
-                        </div>
-
-                        <div class="p-6 bg-black/40 border border-border rounded-xl">
-                            <h4 class="font-bold text-white mb-4 font-sans text-lg">⚠️ Pegadinhas Clássicas FGV</h4>
-                            <div class="space-y-3">
-                                <div>
-                                    <strong class="text-danger">❌ A PRAZO / A VISTA</strong>
-                                    <p class="text-sm text-muted">"Prazo" é masculino. "A vista" em prova, prefira sem crase.</p>
-                                </div>
-                                <div>
-                                    <strong class="text-danger">❌ CASA / TERRA</strong>
-                                    <p class="text-sm text-muted">Só tem crase se tiver DONO (especificada).</p>
-                                    <p class="text-xs text-gray-400"><em>Cheguei a casa.</em> (Sem) | <em>Cheguei à casa da Maria.</em> (Com)</p>
+                            <div class="p-8 rounded-[2rem] bg-rose-500/10 border border-rose-500/30 relative overflow-hidden">
+                                <h4 class="text-rose-400 text-xs font-bold uppercase tracking-widest mb-6 flex items-center gap-3">
+                                    <i data-lucide="alert-triangle" class="w-5 h-5"></i> Atenção FGV
+                                </h4>
+                                <div class="space-y-4">
+                                    <div class="bg-black/40 p-5 rounded-2xl border border-white/10">
+                                        <p class="text-xs font-black text-white uppercase mb-2">CASA / TERRA</p>
+                                        <p class="text-sm text-slate-200 font-medium">Só tem crase se estiver <span class="text-rose-400 font-bold">ESPECIFICADA</span> (com dono).</p>
+                                        <p class="text-[11px] text-slate-400 mt-2 italic">Ex: Vou à casa da Maria.</p>
+                                    </div>
+                                    <div class="bg-black/40 p-5 rounded-2xl border border-white/10">
+                                        <p class="text-xs font-black text-white uppercase mb-2">DISTÂNCIA</p>
+                                        <p class="text-sm text-slate-200 font-medium">Só craseia se a distância for <span class="text-rose-400 font-bold">DETERMINADA</span>.</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </article>
 
-                <hr class="border-border">
+                
 
                 <article id="tipos-textuais" class="scroll-mt-24">
                     <header class="mb-8 border-b border-border pb-6 flex justify-between items-end">
                         <div>
                             <h2 class="font-sans text-4xl font-extrabold text-white mb-2">2. Tipos Textuais</h2>
-                            <p class="text-muted">Palavras-chave estruturais.</p>
+                            <p class="text-muted">Palavras-chave e Marcadores Gramaticais.</p>
                         </div>
-                        <span class="text-xs font-mono text-muted uppercase">Clique para virar</span>
+                        <span class="text-xs font-mono text-muted uppercase animate-pulse">Clique nos cards</span>
                     </header>
 
                     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 font-sans">
-                        <div class="group h-64 w-full cursor-pointer perspective-1000" x-data="{ flipped: false }" @click="flipped = !flipped">
+                        
+                        <div class="group h-72 w-full cursor-pointer perspective-1000" x-data="{ flipped: false }" @click="flipped = !flipped">
                             <div class="relative w-full h-full duration-500 preserve-3d" :class="flipped ? 'rotate-y-180' : ''">
                                 <div class="absolute w-full h-full bg-paper border border-border rounded-xl flex flex-col items-center justify-center backface-hidden shadow-lg group-hover:border-primary transition-all">
-                                    <span class="text-4xl mb-4">🎬</span>
-                                    <h3 class="font-bold text-lg text-white">Narrativo</h3>
+                                    <span class="text-5xl mb-4">🎬</span>
+                                    <h3 class="font-bold text-xl text-white tracking-wide">Narrativo</h3>
+                                    <p class="text-xs text-primary mt-2">O tempo passa</p>
                                 </div>
                                 <div class="absolute w-full h-full bg-paper border-2 border-primary rounded-xl flex flex-col items-center justify-center backface-hidden rotate-y-180 p-4 text-center">
-                                    <h3 class="text-primary font-bold text-xl mb-2">FILME</h3>
-                                    <p class="text-sm text-muted">História, Tempo passa, Ação.</p>
+                                    <h3 class="text-primary font-bold text-lg mb-2 uppercase border-b border-primary/30 pb-1 w-full">É um FILME</h3>
+                                    <ul class="text-sm text-gray-300 space-y-2 text-left w-full pl-2">
+                                        <li>⏱️ <strong>Evolução Cronológica</strong> (Antes/Depois)</li>
+                                        <li>🏃 <strong>Verbos de Ação</strong> (Correu, Fez)</li>
+                                        <li>👤 Personagens + Cenário</li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
-                        <div class="group h-64 w-full cursor-pointer perspective-1000" x-data="{ flipped: false }" @click="flipped = !flipped">
+
+                        <div class="group h-72 w-full cursor-pointer perspective-1000" x-data="{ flipped: false }" @click="flipped = !flipped">
                             <div class="relative w-full h-full duration-500 preserve-3d" :class="flipped ? 'rotate-y-180' : ''">
                                 <div class="absolute w-full h-full bg-paper border border-border rounded-xl flex flex-col items-center justify-center backface-hidden shadow-lg group-hover:border-success transition-all">
-                                    <span class="text-4xl mb-4">🖼️</span>
-                                    <h3 class="font-bold text-lg text-white">Descritivo</h3>
+                                    <span class="text-5xl mb-4">🖼️</span>
+                                    <h3 class="font-bold text-xl text-white tracking-wide">Descritivo</h3>
+                                    <p class="text-xs text-success mt-2">O tempo para</p>
                                 </div>
                                 <div class="absolute w-full h-full bg-paper border-2 border-success rounded-xl flex flex-col items-center justify-center backface-hidden rotate-y-180 p-4 text-center">
-                                    <h3 class="text-success font-bold text-xl mb-2">FOTO</h3>
-                                    <p class="text-sm text-muted">Retrato, Adjetivos, Cena Parada.</p>
+                                    <h3 class="text-success font-bold text-lg mb-2 uppercase border-b border-success/30 pb-1 w-full">É uma FOTO</h3>
+                                    <ul class="text-sm text-gray-300 space-y-2 text-left w-full pl-2">
+                                        <li>⏸️ <strong>Cena Congelada</strong> (Simultaneidade)</li>
+                                        <li>✨ <strong>Muitos Adjetivos</strong> (Caracterização)</li>
+                                        <li>💤 <strong>Verbos de Estado</strong> (Era, Estava)</li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
-                        <div class="group h-64 w-full cursor-pointer perspective-1000" x-data="{ flipped: false }" @click="flipped = !flipped">
+
+                        <div class="group h-72 w-full cursor-pointer perspective-1000" x-data="{ flipped: false }" @click="flipped = !flipped">
                             <div class="relative w-full h-full duration-500 preserve-3d" :class="flipped ? 'rotate-y-180' : ''">
                                 <div class="absolute w-full h-full bg-paper border border-border rounded-xl flex flex-col items-center justify-center backface-hidden shadow-lg group-hover:border-warning transition-all">
-                                    <span class="text-4xl mb-4">🧠</span>
-                                    <h3 class="font-bold text-lg text-white">Dissertativo</h3>
+                                    <span class="text-5xl mb-4">🧠</span>
+                                    <h3 class="font-bold text-xl text-white tracking-wide">Dissertativo</h3>
+                                    <p class="text-xs text-warning mt-2">Ideias e Fatos</p>
                                 </div>
                                 <div class="absolute w-full h-full bg-paper border-2 border-warning rounded-xl flex flex-col items-center justify-center backface-hidden rotate-y-180 p-4 text-center">
-                                    <h3 class="text-warning font-bold text-xl mb-2">IDEIA</h3>
-                                    <p class="text-xs text-muted mb-1">Argumentativo: Convencer.</p>
-                                    <p class="text-xs text-muted">Expositivo: Informar.</p>
+                                    <h3 class="text-warning font-bold text-lg mb-2 uppercase border-b border-warning/30 pb-1 w-full">OPINIÃO vs SABER</h3>
+                                    <ul class="text-sm text-gray-300 space-y-2 text-left w-full pl-2">
+                                        <li>🗣️ <strong>Argumentativo:</strong> Convencer/Defender Tese (Tem juízo de valor).</li>
+                                        <li>📚 <strong>Expositivo:</strong> Apenas informar/Explicar (Aula neutra).</li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
-                        <div class="group h-64 w-full cursor-pointer perspective-1000" x-data="{ flipped: false }" @click="flipped = !flipped">
+
+                        <div class="group h-72 w-full cursor-pointer perspective-1000" x-data="{ flipped: false }" @click="flipped = !flipped">
                             <div class="relative w-full h-full duration-500 preserve-3d" :class="flipped ? 'rotate-y-180' : ''">
                                 <div class="absolute w-full h-full bg-paper border border-border rounded-xl flex flex-col items-center justify-center backface-hidden shadow-lg group-hover:border-danger transition-all">
-                                    <span class="text-4xl mb-4">🛠️</span>
-                                    <h3 class="font-bold text-lg text-white">Injuntivo</h3>
+                                    <span class="text-5xl mb-4">🛠️</span>
+                                    <h3 class="font-bold text-xl text-white tracking-wide">Injuntivo</h3>
+                                    <p class="text-xs text-danger mt-2">Ordem e Instrução</p>
                                 </div>
                                 <div class="absolute w-full h-full bg-paper border-2 border-danger rounded-xl flex flex-col items-center justify-center backface-hidden rotate-y-180 p-4 text-center">
-                                    <h3 class="text-danger font-bold text-xl mb-2">ORDEM</h3>
-                                    <p class="text-sm text-muted">Imperativo. Instrução. (Receita).</p>
+                                    <h3 class="text-danger font-bold text-lg mb-2 uppercase border-b border-danger/30 pb-1 w-full">MANUAL / RECEITA</h3>
+                                    <ul class="text-sm text-gray-300 space-y-2 text-left w-full pl-2">
+                                        <li>☝️ <strong>Verbos no Imperativo</strong> (Faça, Leia, Digite).</li>
+                                        <li>📋 Instuir o leitor a realizar uma ação.</li>
+                                        <li>⚖️ Leis e Manuais.</li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </article>
 
-                <hr class="border-border">
 
-                <article id="extras" class="scroll-mt-24">
-                    <h2 class="font-sans text-3xl font-extrabold text-white mb-6">3. Mnemônicos Extras</h2>
+                <article id="extras" class="scroll-mt-32 max-w-6xl mx-auto p-8 bg-paper text-slate-200 font-sans rounded-[2rem] border border-white/5 shadow-2xl">
+    
+                    <h2 class="text-4xl font-black text-white mb-10 flex items-center gap-4">
+                        <span class="bg-slate-800 p-3 rounded-2xl border border-white/10">
+                            <i data-lucide="award" class="w-6 h-6 text-blue-400"></i>
+                        </span>
+                        3. Mnemônicos de Ouro
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500 border border-white/10 px-3 py-1 rounded-full">Provas 2026</span>
+                    </h2>
+                    
                     <div class="grid md:grid-cols-2 gap-6">
-                        <div class="bg-paper p-5 rounded-xl border border-border">
-                            <strong class="text-primary block mb-2 font-sans">🧲 Próclise (NARIZ)</strong>
-                            <p class="text-sm text-muted mb-2">Palavras que puxam o pronome:</p>
-                            <ul class="text-sm text-gray-300 list-disc pl-4">
-                                <li><strong>N</strong>egação</li>
-                                <li><strong>A</strong>dvérbio</li>
-                                <li><strong>R</strong>elativo</li>
-                                <li><strong>I</strong>ndefinido</li>
-                                <li><strong>Z</strong> (Conjunção Subordinativa)</li>
-                            </ul>
+                        
+                        <div class="bg-slate-900/50 rounded-3xl border border-white/5 overflow-hidden group hover:border-blue-500/30 transition-all">
+                            <div class="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+                                <strong class="text-white text-lg flex items-center gap-2 font-bold">
+                                    <i data-lucide="magnet" class="w-5 h-5 text-blue-400"></i> Ímãs de Próclise
+                                </strong>
+                                <span class="text-[10px] font-mono text-blue-400/70 uppercase tracking-tighter bg-blue-500/10 px-2 py-1 rounded">Regra do NARIZ</span>
+                            </div>
+                            <div class="p-6">
+                                <p class="text-xs text-slate-500 mb-6 italic">Palavras que "puxam" o pronome para antes do verbo:</p>
+                                <div class="grid grid-cols-1 gap-3">
+                                    <div class="flex items-center gap-4 p-3 rounded-xl bg-white/[0.03] border border-white/5 hover:bg-blue-500/5 transition">
+                                        <span class="text-xl font-black text-blue-500 w-6">N</span>
+                                        <span class="text-sm font-medium"><b>N</b>egação <span class="text-slate-500 ml-2 text-xs">(Não se vá)</span></span>
+                                    </div>
+                                    <div class="flex items-center gap-4 p-3 rounded-xl bg-white/[0.03] border border-white/5">
+                                        <span class="text-xl font-black text-blue-500 w-6">A</span>
+                                        <span class="text-sm font-medium"><b>A</b>dvérbio <span class="text-slate-500 ml-2 text-xs">(Aqui se faz)</span></span>
+                                    </div>
+                                    <div class="flex items-center gap-4 p-3 rounded-xl bg-white/[0.03] border border-white/5">
+                                        <span class="text-xl font-black text-blue-500 w-6">R</span>
+                                        <span class="text-sm font-medium"><b>R</b>elativo <span class="text-slate-500 ml-2 text-xs">(Que se diz)</span></span>
+                                    </div>
+                                    <div class="flex items-center gap-4 p-3 rounded-xl bg-white/[0.03] border border-white/5">
+                                        <span class="text-xl font-black text-blue-500 w-6">I</span>
+                                        <span class="text-sm font-medium"><b>I</b>ndefinido <span class="text-slate-500 ml-2 text-xs">(Tudo se perde)</span></span>
+                                    </div>
+                                    <div class="flex items-center gap-4 p-3 rounded-xl bg-white/[0.03] border border-white/5">
+                                        <span class="text-xl font-black text-blue-500 w-6">Z</span>
+                                        <span class="text-sm font-medium">Conjunção <b>Z</b>ubordinativa</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="bg-paper p-5 rounded-xl border border-border">
-                            <strong class="text-primary block mb-2 font-sans">🔄 LHE = DELE</strong>
-                            <p class="text-sm text-muted">Se trocar e fizer sentido → POSSE.</p>
-                            <p class="text-xs mt-2 italic text-gray-400">Ex: "Toquei-lhe o rosto" = "Toquei o rosto dele".</p>
+
+                        <div class="bg-slate-900/50 rounded-3xl border border-white/5 overflow-hidden group hover:border-purple-500/30 transition-all flex flex-col">
+                            <div class="p-6 border-b border-white/5 bg-white/[0.02]">
+                                <strong class="text-white text-lg flex items-center gap-2 font-bold">
+                                    <i data-lucide="key" class="w-5 h-5 text-purple-400"></i> Pronome LHE
+                                </strong>
+                            </div>
+                            <div class="p-8 flex-1 flex flex-col justify-center items-center text-center">
+                                <div class="flex items-center gap-6 mb-8">
+                                    <div class="bg-slate-800 px-6 py-3 rounded-2xl border border-white/10 shadow-xl">
+                                        <span class="text-2xl font-black text-white">LHE</span>
+                                    </div>
+                                    <i data-lucide="arrow-right-left" class="text-purple-500 w-6 h-6 animate-pulse"></i>
+                                    <div class="bg-purple-900/20 px-6 py-3 rounded-2xl border border-purple-500/30">
+                                        <span class="text-2xl font-black text-purple-400">POSSE</span>
+                                    </div>
+                                </div>
+                                <p class="text-sm text-slate-400 leading-relaxed max-w-xs">
+                                    Se você conseguir trocar por <span class="text-purple-300 font-bold underline decoration-purple-500/50">DELE / DELA</span>, ele indica posse.
+                                </p>
+                                <div class="mt-6 p-4 bg-black/40 rounded-2xl border border-white/5 w-full italic text-xs text-slate-500">
+                                    "Beijei-<b class="text-purple-400">lhe</b> a mão" = "Beijei a mão <b class="text-purple-400">dele</b>"
+                                </div>
+                            </div>
                         </div>
-                        <div class="bg-paper p-5 rounded-xl border border-border">
-                            <strong class="text-primary block mb-2 font-sans">🧱 HAVER vs TER</strong>
-                            <p class="text-sm text-muted">Haver = Existir (Singular). <br>Ter = Posse.</p>
-                            <p class="text-xs mt-2 text-danger">❌ "Tem gente aqui"</p>
-                            <p class="text-xs text-success">✅ "Há gente aqui"</p>
+
+                        <div class="bg-slate-900/50 rounded-3xl border border-white/5 overflow-hidden group hover:border-slate-700 transition-all">
+                            <div class="p-6 border-b border-white/5 bg-white/[0.02]">
+                                <strong class="text-white text-lg flex items-center gap-2 font-bold">
+                                    <i data-lucide="check-square" class="w-5 h-5 text-slate-400"></i> Existencialismo
+                                </strong>
+                            </div>
+                            <div class="grid grid-cols-2 divide-x divide-white/5 h-full">
+                                <div class="p-8 flex flex-col items-center justify-center group/item hover:bg-rose-500/[0.02] transition">
+                                    <div class="w-12 h-12 rounded-full bg-rose-500/10 flex items-center justify-center mb-4">
+                                        <i data-lucide="x" class="w-6 h-6 text-rose-500"></i>
+                                    </div>
+                                    <span class="text-2xl font-black text-white mb-1">TER</span>
+                                    <span class="text-[10px] uppercase tracking-widest text-rose-500/70 font-bold">Proibido</span>
+                                    <p class="mt-4 text-xs text-slate-500 line-through">"Tem muita gente"</p>
+                                </div>
+                                <div class="p-8 flex flex-col items-center justify-center group/item hover:bg-emerald-500/[0.02] transition">
+                                    <div class="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center mb-4">
+                                        <i data-lucide="check" class="w-6 h-6 text-emerald-500"></i>
+                                    </div>
+                                    <span class="text-2xl font-black text-white mb-1">HAVER</span>
+                                    <span class="text-[10px] uppercase tracking-widest text-emerald-500/70 font-bold">Correto</span>
+                                    <p class="mt-4 text-xs text-emerald-400 font-bold">"Há muita gente"</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="bg-paper p-5 rounded-xl border border-border">
-                            <strong class="text-primary block mb-2 font-sans">🎬 Filme vs Foto</strong>
-                            <p class="text-sm text-gray-300">Narração = Tempo anda (Filme).</p>
-                            <p class="text-sm text-gray-300">Dissertação/Descrição = Ideia parada (Foto).</p>
+
+                        <div class="bg-slate-900/50 rounded-3xl border border-white/5 overflow-hidden group hover:border-slate-700 transition-all">
+                            <div class="p-6 border-b border-white/5 bg-white/[0.02]">
+                                <strong class="text-white text-lg flex items-center gap-2 font-bold">
+                                    <i data-lucide="navigation" class="w-5 h-5 text-slate-400"></i> Localização
+                                </strong>
+                            </div>
+                            <div class="p-6 space-y-4">
+                                <div class="flex items-center gap-5 p-4 rounded-2xl hover:bg-white/[0.02] transition">
+                                    <div class="p-3 bg-slate-800 rounded-xl border border-white/10 text-slate-400">
+                                        <i data-lucide="map-pin" class="w-5 h-5"></i>
+                                    </div>
+                                    <div>
+                                        <span class="text-sm font-black text-white">ONDE <span class="text-[10px] text-slate-500 font-normal ml-2 uppercase tracking-widest">(Fixo)</span></span>
+                                        <p class="text-xs text-slate-500 italic mt-1">"Onde você está?"</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="h-px bg-gradient-to-r from-transparent via-white/5 to-transparent w-full"></div>
+
+                                <div class="flex items-center gap-5 p-4 rounded-2xl hover:bg-white/[0.02] transition">
+                                    <div class="p-3 bg-blue-500/10 rounded-xl border border-blue-500/20 text-blue-400">
+                                        <i data-lucide="move-right" class="w-5 h-5"></i>
+                                    </div>
+                                    <div>
+                                        <span class="text-sm font-black text-white">AONDE <span class="text-[10px] text-blue-400/70 font-normal ml-2 uppercase tracking-widest">(Movimento)</span></span>
+                                        <p class="text-xs text-blue-400/60 italic mt-1">"Aonde você vai?"</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+
                     </div>
                 </article>
 
-                <hr class="border-border">
+                <article id="conectivos" class="scroll-mt-32 max-w-6xl mx-auto p-8 bg-paper text-slate-200 font-sans rounded-[2rem] border border-white/5 shadow-2xl relative overflow-hidden">
+    
+                    <div class="absolute top-0 right-0 px-6 py-2 bg-blue-600/20 text-blue-400 text-[10px] font-black uppercase tracking-widest rounded-bl-2xl border-l border-b border-blue-500/20">
+                        Top 1 FGV
+                    </div>
 
-                <article id="conectivos" class="scroll-mt-24">
-                    <header class="mb-8 border-b border-border pb-6">
-                        <h2 class="font-sans text-4xl font-extrabold text-white mb-2">4. Conectivos (A Alma)</h2>
-                        <p class="text-muted">A FGV pede a troca. Memorize os grupos.</p>
+                    <header class="mb-12">
+                        <h2 class="text-4xl font-black text-white mb-2 tracking-tight">4. Conectivos (A Alma)</h2>
+                        <p class="text-slate-500 font-medium">A lógica por trás da interpretação e reescritura.</p>
+                        <div class="h-1 w-20 bg-blue-600 mt-4 rounded-full opacity-50"></div>
                     </header>
 
-                    <div class="grid md:grid-cols-3 gap-4 font-sans">
-                        <div class="bg-paper p-6 rounded-xl border border-border text-center">
-                            <span class="text-xs font-bold text-danger uppercase tracking-wide">Adversativa</span>
-                            <h3 class="text-2xl font-black text-white my-2">MAS</h3>
-                            <p class="text-xs text-muted mb-4">Quebra de expectativa</p>
-                            <div class="text-sm text-gray-300 space-y-1 border-t border-border pt-4">
-                                <p>Porém</p><p>Contudo</p><p>Todavia</p><p>Entretanto</p>
+                    <div class="grid md:grid-cols-3 gap-6">
+                        
+                        <div class="bg-slate-900/40 rounded-3xl border border-white/5 overflow-hidden flex flex-col group hover:border-rose-500/30 transition-all">
+                            <div class="p-6 border-b border-white/5 bg-white/[0.02] text-center">
+                                <div class="w-10 h-10 bg-rose-500/10 rounded-xl flex items-center justify-center mx-auto mb-3">
+                                    <i data-lucide="arrow-left-right" class="w-5 h-5 text-rose-500"></i>
+                                </div>
+                                <h3 class="text-3xl font-black text-white italic">MAS</h3>
+                                <span class="text-[10px] font-bold text-rose-500/80 uppercase tracking-widest">Adversativa</span>
                             </div>
-                            <p class="text-xs text-danger mt-4 font-bold">⛔ Nunca "Embora"</p>
-                        </div>
-                        <div class="bg-paper p-6 rounded-xl border border-border text-center ring-1 ring-warning/50">
-                            <span class="text-xs font-bold text-warning uppercase tracking-wide">Concessiva</span>
-                            <h3 class="text-2xl font-black text-white my-2">EMBORA</h3>
-                            <p class="text-xs text-muted mb-4">Teimosia</p>
-                            <div class="text-sm text-gray-300 space-y-1 border-t border-border pt-4">
-                                <p>Conquanto</p><p>Ainda que</p><p>Mesmo que</p>
+                            <div class="p-6 flex-1 space-y-4">
+                                <div class="bg-black/40 p-4 rounded-2xl border border-white/5">
+                                    <p class="text-[10px] text-slate-500 uppercase font-bold mb-2">Lógica de Impacto:</p>
+                                    <p class="text-sm leading-relaxed">"É legal, <span class="text-rose-400 font-bold">mas é caro.</span>"</p>
+                                    <p class="text-[10px] text-rose-500 mt-2 font-bold uppercase">➡ Foco no 2º termo (Negativo)</p>
+                                </div>
+                                <div class="flex flex-wrap gap-2 pt-2">
+                                    <span class="text-[10px] px-2 py-1 bg-white/5 rounded-md text-slate-400 border border-white/5">Porém</span>
+                                    <span class="text-[10px] px-2 py-1 bg-white/5 rounded-md text-slate-400 border border-white/5">Contudo</span>
+                                    <span class="text-[10px] px-2 py-1 bg-white/5 rounded-md text-slate-400 border border-white/5">Todavia</span>
+                                </div>
                             </div>
-                            <p class="text-xs text-warning mt-4 font-bold">💡 Troca por "Apesar de"</p>
+                            <div class="bg-rose-500/5 p-3 text-center text-[10px] text-rose-500/70 font-bold border-t border-rose-500/10">
+                                O 2º TERMO ANULA O 1º
+                            </div>
                         </div>
-                        <div class="bg-paper p-6 rounded-xl border border-border text-center">
-                            <span class="text-xs font-bold text-primary uppercase tracking-wide">Causal</span>
-                            <h3 class="text-2xl font-black text-white my-2">PORQUE</h3>
-                            <p class="text-xs text-muted mb-4">Motivo / Razão</p>
-                            <div class="text-sm text-gray-300 space-y-1 border-t border-border pt-4">
-                                <p>Pois</p><p>Visto que</p><p>Porquanto</p>
+
+                        <div class="bg-slate-900/40 rounded-3xl border border-white/5 overflow-hidden flex flex-col group hover:border-amber-500/30 transition-all">
+                            <div class="p-6 border-b border-white/5 bg-white/[0.02] text-center">
+                                <div class="w-10 h-10 bg-amber-500/10 rounded-xl flex items-center justify-center mx-auto mb-3">
+                                    <i data-lucide="shield-check" class="w-5 h-5 text-amber-500"></i>
+                                </div>
+                                <h3 class="text-3xl font-black text-white italic">EMBORA</h3>
+                                <span class="text-[10px] font-bold text-amber-500/80 uppercase tracking-widest">Concessiva</span>
+                            </div>
+                            <div class="p-6 flex-1 space-y-4">
+                                <div class="bg-black/40 p-4 rounded-2xl border border-white/5">
+                                    <p class="text-[10px] text-slate-500 uppercase font-bold mb-2">Lógica de Teimosia:</p>
+                                    <p class="text-sm leading-relaxed">"<span class="text-amber-400 font-bold">Embora seja caro</span>, é legal."</p>
+                                    <p class="text-[10px] text-emerald-500 mt-2 font-bold uppercase">➡ Foco no 2º termo (Positivo)</p>
+                                </div>
+                                <div class="flex flex-wrap gap-2 pt-2">
+                                    <span class="text-[10px] px-2 py-1 bg-white/5 rounded-md text-slate-400 border border-white/5">Conquanto</span>
+                                    <span class="text-[10px] px-2 py-1 bg-white/5 rounded-md text-slate-400 border border-white/5">Ainda que</span>
+                                    <span class="text-[10px] px-2 py-1 bg-white/5 rounded-md text-slate-400 border border-white/5">Posto que</span>
+                                </div>
+                            </div>
+                            <div class="bg-amber-500/5 p-3 text-center text-[10px] text-amber-500/70 font-bold border-t border-amber-500/10">
+                                O OBSTÁCULO NÃO IMPEDE
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-900/40 rounded-3xl border border-white/5 overflow-hidden flex flex-col group hover:border-emerald-500/30 transition-all">
+                            <div class="p-6 border-b border-white/5 bg-white/[0.02] text-center">
+                                <div class="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center mx-auto mb-3">
+                                    <i data-lucide="help-circle" class="w-5 h-5 text-emerald-500"></i>
+                                </div>
+                                <h3 class="text-3xl font-black text-white italic">PORQUE</h3>
+                                <span class="text-[10px] font-bold text-emerald-500/80 uppercase tracking-widest">Causal</span>
+                            </div>
+                            <div class="p-6 flex-1 space-y-4">
+                                <div class="bg-black/40 p-4 rounded-2xl border border-white/5">
+                                    <p class="text-[10px] text-slate-500 uppercase font-bold mb-2">Lógica de Origem:</p>
+                                    <p class="text-sm leading-relaxed">"Passou <span class="text-emerald-400 font-bold">porque estudou.</span>"</p>
+                                    <p class="text-[10px] text-emerald-500/70 mt-2 font-bold uppercase">➡ O fato gerador</p>
+                                </div>
+                                <div class="flex flex-wrap gap-2 pt-2">
+                                    <span class="text-[10px] px-2 py-1 bg-white/5 rounded-md text-slate-400 border border-white/5">Pois</span>
+                                    <span class="text-[10px] px-2 py-1 bg-white/5 rounded-md text-slate-400 border border-white/5">Visto que</span>
+                                    <span class="text-[10px] px-2 py-1 bg-white/5 rounded-md text-slate-400 border border-white/5">Já que</span>
+                                </div>
+                            </div>
+                            <div class="bg-emerald-500/5 p-3 text-center text-[10px] text-emerald-500/70 font-bold border-t border-emerald-500/10">
+                                EXPLICAÇÃO OU MOTIVO
                             </div>
                         </div>
                     </div>
 
-                    <div class="mt-8 bg-paper p-6 rounded-xl border border-border font-sans">
-                        <h4 class="font-bold text-white mb-4">💀 Tabela da Morte (Parônimos)</h4>
-                        <ul class="space-y-2 text-sm text-gray-300">
-                            <li class="flex justify-between border-b border-border pb-2"><span class="text-warning font-bold">Conquanto</span> <span>= Embora (Teimosia)</span></li>
-                            <li class="flex justify-between border-b border-border pb-2"><span class="text-primary font-bold">Porquanto</span> <span>= Porque (Causa)</span></li>
-                            <li class="flex justify-between"><span class="text-danger font-bold">Contudo</span> <span>= Mas (Oposição)</span></li>
-                        </ul>
+                    <div class="mt-12 bg-black/40 rounded-[2rem] border border-white/5 p-8 relative overflow-hidden">
+                        <div class="flex items-center gap-3 mb-8">
+                            <div class="p-2 bg-rose-500/20 rounded-lg text-rose-500">
+                                <i data-lucide="zap" class="w-5 h-5"></i>
+                            </div>
+                            <h4 class="text-xl font-bold text-white tracking-tight">Diferenças Cruciais (FGV)</h4>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-x-12 gap-y-6">
+                            <div class="flex items-center justify-between p-4 bg-white/[0.02] rounded-2xl border border-white/5 hover:bg-white/[0.04] transition">
+                                <div class="flex flex-col">
+                                    <span class="text-amber-400 font-mono text-lg font-black tracking-tighter">CONQUANTO</span>
+                                    <span class="text-[9px] text-slate-500 uppercase font-bold mt-1">Embora (Concessão)</span>
+                                </div>
+                                <i data-lucide="chevron-right" class="text-slate-700 w-5 h-5"></i>
+                                <div class="text-right">
+                                    <span class="text-white font-bold italic">Teimosia</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between p-4 bg-white/[0.02] rounded-2xl border border-white/5 hover:bg-white/[0.04] transition">
+                                <div class="flex flex-col">
+                                    <span class="text-emerald-400 font-mono text-lg font-black tracking-tighter">PORQUANTO</span>
+                                    <span class="text-[9px] text-slate-500 uppercase font-bold mt-1">Porque (Causa)</span>
+                                </div>
+                                <i data-lucide="chevron-right" class="text-slate-700 w-5 h-5"></i>
+                                <div class="text-right">
+                                    <span class="text-white font-bold italic">Motivo</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between p-4 bg-white/[0.02] rounded-2xl border border-white/5 hover:bg-white/[0.04] transition">
+                                <div class="flex flex-col">
+                                    <span class="text-rose-400 font-mono text-lg font-black tracking-tighter">CONTUDO</span>
+                                    <span class="text-[9px] text-slate-500 uppercase font-bold mt-1">Mas (Oposição)</span>
+                                </div>
+                                <i data-lucide="chevron-right" class="text-slate-700 w-5 h-5"></i>
+                                <div class="text-right">
+                                    <span class="text-white font-bold italic">Anulação</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between p-4 bg-white/[0.02] rounded-2xl border border-white/5 hover:bg-white/[0.04] transition">
+                                <div class="flex flex-col">
+                                    <span class="text-blue-400 font-mono text-lg font-black tracking-tighter">PORTANTO</span>
+                                    <span class="text-[9px] text-slate-500 uppercase font-bold mt-1">Então (Conclusão)</span>
+                                </div>
+                                <i data-lucide="chevron-right" class="text-slate-700 w-5 h-5"></i>
+                                <div class="text-right">
+                                    <span class="text-white font-bold italic">Fechamento</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </article>
 
-                <hr class="border-border">
 
-                <article id="vozes" class="scroll-mt-24">
-                    <h2 class="font-sans text-3xl font-extrabold text-white mb-6">5. Vozes Verbais</h2>
-                    <div class="bg-paper p-6 rounded-xl border border-border">
-                        <h3 class="font-bold text-white mb-4 font-sans">⚙️ O Algoritmo do "X"</h3>
-                        <ol class="list-decimal pl-5 space-y-3 text-gray-300 text-sm">
-                            <li>O <strong>Objeto</strong> vira Sujeito.</li>
-                            <li>O <strong>Sujeito</strong> vira Agente (final).</li>
-                            <li>O Verbo Principal ganha auxiliar <strong>SER</strong>.</li>
-                        </ol>
-                        <div class="mt-6 p-4 bg-black/30 rounded border border-white/5 text-center font-sans">
-                            <strong class="text-warning block mb-2 text-xs uppercase">Regra Importante</strong>
-                            <p class="text-sm text-white">O verbo "SER" deve entrar no <strong>mesmo tempo</strong> do original.</p>
-                            <p class="mt-2 text-emerald-400 font-mono text-sm">Divulgou (Passado) → Foi divulgado.</p>
-                            <p class="mt-1 text-emerald-400 font-mono text-sm">Divulgará (Futuro) → Será divulgado.</p>
-                        </div>
-                    </div>
-                </article>
+                <article id="vozes" class="scroll-mt-32 max-w-5xl mx-auto p-8 bg-paper text-white font-sans rounded-[2rem] shadow-2xl border border-border/50 relative overflow-hidden">
+    
+                    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 via-purple-500 to-emerald-500 opacity-30"></div>
 
-                <hr class="border-border">
+                    <header class="mb-12 text-center">
+                        <h2 class="text-5xl font-black text-white mb-4 tracking-tight">5. Vozes Verbais</h2>
+                        <p class="text-lg text-muted">A "dança das cadeiras" gramatical.</p>
+                        <div class="mt-6 h-1 w-24 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto rounded-full opacity-50"></div>
+                    </header>
 
-                <article id="pontuacao" class="scroll-mt-24">
-                    <h2 class="font-sans text-3xl font-extrabold text-white mb-6">6. Pontuação (Lógica)</h2>
-                    <div class="bg-danger/10 border border-danger/30 p-6 rounded-xl">
-                        <h3 class="text-danger font-bold mb-4 font-sans">🚫 Onde é PROIBIDO usar vírgula</h3>
-                        <p class="text-sm text-gray-300 mb-4">Entre o S.V.C. (Sujeito — Verbo — Complemento).</p>
-                        <div class="space-y-2 text-sm text-gray-400">
-                            <p>❌ Os alunos do curso, fizeram a prova. (Separou Sujeito).</p>
-                            <p>❌ O IBGE contratou, novos agentes. (Separou Objeto).</p>
-                        </div>
-                    </div>
-                    <div class="mt-6 bg-paper p-6 rounded-xl border border-border">
-                        <h3 class="font-bold text-white mb-3 font-sans">✅ Onde é Bem-vinda</h3>
-                        <ul class="list-disc pl-5 text-sm text-gray-300 space-y-2">
-                            <li><strong>Deslocado:</strong> Ontem, o edital saiu.</li>
-                            <li><strong>Explicação (Aposto):</strong> O Brasil, maior país, tem problemas.</li>
-                            <li><strong>Antes do "E":</strong> Só se os sujeitos forem DIFERENTES.</li>
-                        </ul>
-                        <div class="mt-8">
-                            <h3 class="text-xs font-bold text-muted uppercase tracking-widest mb-3 px-2">Parte 3: Ortografia & Semântica</h3>
-                            <ul class="space-y-1">
-                                <li><a href="#concordancia" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="shuffle" class="w-4 h-4 text-pink-500"></i> 7. Concordância</a></li>
-                                <li><a href="#acentuacao" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="music" class="w-4 h-4 text-cyan-400"></i> 8. Acentuação</a></li>
-                                <li><a href="#hifen" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="minus" class="w-4 h-4 text-indigo-400"></i> 9. Hífen (Ímãs)</a></li>
-                                <li><a href="#porques" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="help-circle" class="w-4 h-4 text-orange-400"></i> 10. Os Porquês</a></li>
-                                <li><a href="#se-que" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="code" class="w-4 h-4 text-emerald-400"></i> 11. SE e QUE</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </article>
-                            <hr class="border-border">
+                    <div class="bg-[#0a0a0a] p-10 rounded-[2rem] border border-white/5 mb-12 relative shadow-inner">
+                        <h3 class="text-center text-xs font-bold uppercase tracking-[0.3em] text-purple-300 mb-12 opacity-80">🔄 Fluxo da Transformação</h3>
 
-                <article id="concordancia" class="scroll-mt-24">
-                    <h2 class="font-sans text-3xl font-extrabold text-white mb-6">7. Concordância "Traiçoeira"</h2>
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div class="bg-paper p-6 rounded-xl border border-border">
-                            <h3 class="font-bold text-primary mb-3 font-sans">1. Sujeito Invertido</h3>
-                            <p class="text-sm text-gray-300 mb-3">O verbo obedece ao sujeito, onde quer que ele esteja.</p>
-                            <div class="bg-black/30 p-3 rounded border border-border space-y-2 text-sm">
-                                <p class="text-danger">❌ Falta cinco dias.</p>
-                                <p class="text-success font-bold">✅ Faltam cinco dias.</p>
-                                <p class="text-xs text-muted mt-2 border-t border-gray-700 pt-2">Dica: Pergunte "O QUE?" ao verbo.</p>
+                        <div class="mb-16 relative">
+                            <div class="absolute -top-5 left-1/2 -translate-x-1/2 bg-[#0a0a0a] px-4 py-1 rounded-full border border-blue-500/30 z-20">
+                                <span class="text-[10px] font-bold uppercase tracking-widest text-blue-300">Estado 1: Voz Ativa</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4 text-center items-stretch">
+                                <div class="p-6 rounded-2xl bg-gradient-to-br from-blue-900/40 to-blue-600/10 border border-blue-500/30 shadow-[0_0_20px_rgba(59,130,246,0.1)] flex flex-col justify-center">
+                                    <span class="block text-[10px] uppercase font-bold text-blue-300 opacity-60 mb-2">Sujeito (Quem age)</span>
+                                    <p class="text-2xl font-black tracking-tight">O Governo</p>
+                                    <i data-lucide="arrow-right" class="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 text-blue-500/20 w-8 h-8 z-10"></i>
+                                </div>
+
+                                <div class="p-6 flex flex-col justify-center items-center border-y-2 md:border-y-0 md:border-x-2 border-dashed border-white/10 bg-white/5 rounded-2xl md:rounded-none z-0">
+                                    <p class="text-xl italic font-mono text-gray-300">anunciou</p>
+                                    <span class="text-[10px] text-muted mt-1">(Passado)</span>
+                                </div>
+
+                                <div class="p-6 rounded-2xl bg-gradient-to-bl from-purple-900/40 to-purple-600/10 border border-purple-500/30 shadow-[0_0_20px_rgba(168,85,247,0.1)] flex flex-col justify-center">
+                                    <span class="block text-[10px] uppercase font-bold text-purple-300 opacity-60 mb-2">Objeto (O Alvo)</span>
+                                    <p class="text-2xl font-black tracking-tight">o edital</p>
+                                </div>
                             </div>
                         </div>
-                        <div class="bg-paper p-6 rounded-xl border border-border">
-                            <h3 class="font-bold text-warning mb-3 font-sans">2. A Regra da Seta 🏹</h3>
-                            <ul class="space-y-3 text-sm text-gray-300">
-                                <li>
-                                    <strong class="text-white block">Seta aponta para NOME?</strong>
-                                    <span>Varia (Adjetivo).</span><br>
-                                    <em class="text-xs text-muted">"Tomou <strong>meia</strong> garrafa."</em>
-                                </li>
-                                <li>
-                                    <strong class="text-white block">Seta aponta para VERBO/ADJ?</strong>
-                                    <span>Não varia (Advérbio).</span><br>
-                                    <em class="text-xs text-muted">"A garrafa está <strong>meio</strong> aberta."</em>
-                                </li>
-                            </ul>
+
+                        <div class="flex justify-center -my-10 relative z-30">
+                            <div class="bg-gradient-to-br from-purple-500 to-blue-600 p-3 rounded-2xl shadow-xl shadow-purple-500/20 text-white animate-pulse">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
+                            </div>
+                        </div>
+
+                        <div class="mt-16 relative">
+                            <div class="absolute -top-5 left-1/2 -translate-x-1/2 bg-[#0a0a0a] px-4 py-1 rounded-full border border-purple-500/30 z-20">
+                                <span class="text-[10px] font-bold uppercase tracking-widest text-purple-300">Estado 2: Voz Passiva</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4 text-center items-stretch">
+                                <div class="p-6 rounded-2xl bg-gradient-to-tr from-purple-600/20 to-purple-900/10 border-2 border-purple-500 shadow-[0_0_30px_rgba(168,85,247,0.2)] flex flex-col justify-center relative overflow-hidden">
+                                    <div class="absolute top-0 left-0 w-full h-1 bg-purple-500 opacity-50"></div>
+                                    <span class="block text-[10px] text-purple-300 uppercase font-bold mb-2">Novo Sujeito (Promovido)</span>
+                                    <p class="text-2xl font-black tracking-tight">O edital</p>
+                                </div>
+
+                                <div class="p-6 rounded-2xl bg-gradient-to-b from-emerald-900/30 to-emerald-950/30 border border-emerald-500/50 flex flex-col justify-center shadow-[0_0_20px_rgba(16,185,129,0.1)]">
+                                    <p class="text-xl font-bold text-emerald-300 font-mono">foi anunciado</p>
+                                    <span class="text-[9px] uppercase font-bold text-emerald-600/70 mt-2">Verbo "SER" + Particípio</span>
+                                </div>
+
+                                <div class="p-6 rounded-2xl border border-blue-500/20 bg-white/5 opacity-40 flex flex-col justify-center grayscale-[50%]">
+                                    <span class="block text-[10px] text-blue-300 uppercase font-bold mb-2">Agente (Empurrado p/ fim)</span>
+                                    <p class="text-xl font-bold text-gray-400">pelo Governo</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-8 mt-8">
+                        <div class="bg-black/30 p-8 rounded-[2rem] border border-emerald-500/20 hover:border-emerald-500/50 transition group relative overflow-hidden">
+                            <div class="absolute top-0 left-0 w-2 h-full bg-emerald-500 opacity-50 group-hover:opacity-100 transition"></div>
+                            <h4 class="text-emerald-300 font-bold mb-6 flex items-center gap-3 text-sm uppercase tracking-wider">
+                                <span class="p-2 bg-emerald-500/10 rounded-lg"><i data-lucide="clock" class="w-5 h-5"></i></span> 
+                                A Regra do Tempo
+                            </h4>
+                            <p class="text-sm text-muted mb-6 leading-relaxed">O verbo auxiliar <b>SER</b> funciona como um camaleão: ele deve imitar o tempo do verbo original.</p>
+                            <div class="space-y-3 font-mono text-xs">
+                                <div class="flex justify-between items-center p-3 bg-[#121212] rounded-xl border border-white/5">
+                                    <span class="text-gray-500">Faz (Presente)</span> 
+                                    <i data-lucide="arrow-right" class="w-4 h-4 text-white/20"></i>
+                                    <span class="text-emerald-400 font-bold">É feito</span>
+                                </div>
+                                <div class="flex justify-between items-center p-3 bg-[#121212] rounded-xl border border-white/5">
+                                    <span class="text-gray-500">Fez (Passado)</span> 
+                                    <i data-lucide="arrow-right" class="w-4 h-4 text-white/20"></i>
+                                    <span class="text-emerald-400 font-bold">Foi feito</span>
+                                </div>
+                                <div class="flex justify-between items-center p-3 bg-[#121212] rounded-xl border border-white/5">
+                                    <span class="text-gray-500">Fará (Futuro)</span> 
+                                    <i data-lucide="arrow-right" class="w-4 h-4 text-white/20"></i>
+                                    <span class="text-emerald-400 font-bold">Será feito</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-black/30 p-8 rounded-[2rem] border border-purple-500/20 hover:border-purple-500/50 transition group relative overflow-hidden text-center">
+                            <div class="absolute top-0 right-0 w-2 h-full bg-purple-500 opacity-50 group-hover:opacity-100 transition"></div>
+                            <h4 class="text-purple-300 font-bold mb-6 flex items-center justify-center gap-3 text-sm uppercase tracking-wider">
+                                <span class="p-2 bg-purple-500/10 rounded-lg"><i data-lucide="wand-2" class="w-5 h-5"></i></span>
+                                O Truque do "SE"
+                            </h4>
+                            <p class="text-sm text-muted mb-6 leading-relaxed">Quando o "se" aparece, como saber se é passiva? Tente fazer a mágica da inversão.</p>
+                            
+                            <div class="bg-gradient-to-br from-purple-900/30 to-[#121212] p-6 rounded-2xl border border-purple-500/30 shadow-lg relative">
+                                <div class="absolute top-2 left-1/2 -translate-x-1/2 text-[9px] uppercase text-purple-400 font-bold opacity-70">A frase misteriosa</div>
+                                <p class="text-2xl font-black tracking-tight text-white italic mb-4">"Alugam-se casas"</p>
+                                
+                                <div class="flex items-center justify-center gap-2 my-2 opacity-50">
+                                    <i data-lucide="arrow-down-up" class="w-4 h-4 text-purple-300"></i>
+                                </div>
+
+                                <div class="absolute bottom-2 left-1/2 -translate-x-1/2 text-[9px] uppercase text-purple-400 font-bold opacity-70">A revelação</div>
+                                <p class="text-xl font-bold text-purple-300 mt-4">"Casas SÃO alugadas"</p>
+                            </div>
+                            <p class="mt-6 text-xs text-purple-300/70 uppercase font-bold tracking-widest">Se a mágica funcionou, é voz passiva!</p>
                         </div>
                     </div>
                 </article>
 
-                <hr class="border-border">
+                <article id="pontuacao" class="scroll-mt-32 max-w-5xl mx-auto p-8 bg-[#0f1115] text-slate-100 font-sans rounded-[2rem] shadow-2xl border border-white/10 relative overflow-hidden">
+    
+                    <div class="absolute top-0 right-0 px-6 py-2 bg-blue-600/20 text-blue-400 text-[11px] font-black uppercase tracking-[0.2em] rounded-bl-2xl border-l border-b border-blue-500/20 z-20">
+                        Sintaxe de Pontuação
+                    </div>
 
-                <article id="acentuacao" class="scroll-mt-24">
-                    <h2 class="font-sans text-3xl font-extrabold text-white mb-6">8. Acentuação Lógica</h2>
-                    <div class="space-y-6">
-                        <div class="bg-gradient-to-r from-blue-900/20 to-transparent p-6 rounded-xl border-l-4 border-blue-500">
-                            <h3 class="font-bold text-white font-sans text-lg">Regra de Ouro: O Duelo</h3>
-                            <p class="text-gray-300 mt-2">Oxítonas e Paroxítonas são inimigas. O que uma gosta, a outra odeia.</p>
+                    <header class="mb-12">
+                        <h2 class="text-5xl font-black text-white mb-4 tracking-tight">6. Pontuação</h2>
+                        <p class="text-xl text-slate-400 font-medium italic">"A organização do trânsito textual."</p>
+                        <div class="h-1.5 w-24 bg-blue-600 mt-4 rounded-full opacity-50"></div>
+                    </header>
+
+                    <div class="bg-slate-900/50 p-10 rounded-[2.5rem] border border-white/5 mb-10 relative shadow-inner">
+                        <h3 class="text-center text-xs font-bold uppercase tracking-[0.3em] text-rose-500 mb-10 opacity-90">
+                            🚫 O Pecado Capital: Ordem S.V.C.
+                        </h3>
+                        
+                        <p class="text-sm text-slate-400 text-center mb-10 max-w-2xl mx-auto leading-relaxed">
+                            Na ordem direta, é <span class="text-white font-bold">proibido respirar</span> (usar vírgula) entre estes termos, independentemente do tamanho da frase.
+                        </p>
+                        
+                        <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-0 relative">
+                            <div class="bg-blue-900/20 text-blue-400 border border-blue-500/30 px-8 py-4 rounded-2xl font-black tracking-widest text-lg w-full md:w-auto text-center z-10">
+                                SUJEITO
+                            </div>
+                            
+                            <div class="flex items-center justify-center w-12 h-12 md:w-16">
+                                <div class="h-8 w-1 md:h-1 md:w-full bg-white/10"></div>
+                                <div class="absolute bg-[#0f1115] p-1 rounded-full border border-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.3)]">
+                                    <i data-lucide="ban" class="w-5 h-5 text-rose-500"></i>
+                                </div>
+                            </div>
+
+                            <div class="bg-purple-900/20 text-purple-400 border border-purple-500/30 px-8 py-4 rounded-2xl font-black tracking-widest text-lg w-full md:w-auto text-center z-10">
+                                VERBO
+                            </div>
+
+                            <div class="flex items-center justify-center w-12 h-12 md:w-16">
+                                <div class="h-8 w-1 md:h-1 md:w-full bg-white/10"></div>
+                                <div class="absolute bg-[#0f1115] p-1 rounded-full border border-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.3)]">
+                                    <i data-lucide="ban" class="w-5 h-5 text-rose-500"></i>
+                                </div>
+                            </div>
+
+                            <div class="bg-emerald-900/20 text-emerald-400 border border-emerald-500/30 px-8 py-4 rounded-2xl font-black tracking-widest text-lg w-full md:w-auto text-center z-10">
+                                COMPLEMENTO
+                            </div>
                         </div>
                         
-                        <div class="grid md:grid-cols-2 gap-6 font-sans">
-                            <div class="bg-paper p-6 rounded-xl border border-border relative overflow-hidden">
-                                <div class="absolute top-0 right-0 -mt-2 -mr-2 w-16 h-16 bg-success/20 rounded-full blur-xl"></div>
-                                <h3 class="text-xl font-bold text-success mb-2">Oxítonas (Última)</h3>
-                                <p class="text-xs text-muted mb-4 uppercase tracking-widest">Amam o Básico</p>
-                                <ul class="text-gray-300 space-y-2 text-sm">
-                                    <li>✅ Terminou em <strong>A, E, O, EM, ENS</strong>? → <span class="text-success font-bold">Acentua!</span></li>
-                                    <li class="text-xs text-muted">Ex: Café, Sofá, Armazém.</li>
-                                    <li class="border-t border-border pt-2 mt-2">🚫 Terminou em I ou U? Não acentua (Caju).</li>
-                                </ul>
-                            </div>
-
-                            <div class="bg-paper p-6 rounded-xl border border-border relative overflow-hidden">
-                                <div class="absolute top-0 right-0 -mt-2 -mr-2 w-16 h-16 bg-danger/20 rounded-full blur-xl"></div>
-                                <h3 class="text-xl font-bold text-danger mb-2">Paroxítonas (Penúltima)</h3>
-                                <p class="text-xs text-muted mb-4 uppercase tracking-widest">Odeiam o Básico</p>
-                                <ul class="text-gray-300 space-y-2 text-sm">
-                                    <li>🚫 Terminou em A, E, O, EM? → <span class="text-danger font-bold">NÃO Acentua!</span></li>
-                                    <li class="text-xs text-muted">Ex: Casa, Mesa, Homem.</li>
-                                    <li class="border-t border-border pt-2 mt-2">✅ Resto "estranho" (L, R, N, X, PS, I, U)? Acentua! (Táxi, Vírus).</li>
-                                </ul>
+                        <div class="mt-12 bg-black/60 p-6 rounded-2xl border border-rose-500/20 relative overflow-hidden group">
+                            <p class="text-sm md:text-lg text-slate-300 font-mono leading-relaxed text-center relative z-10">
+                                "Os alunos aprovados no concurso de 2026 
+                                <span class="inline-block px-2 py-0.5 bg-rose-600 text-white font-black rounded mx-1 shadow-[0_0_15px_rgba(225,29,72,0.5)] animate-pulse">,</span> 
+                                comemoraram."
+                            </p>
+                            <div class="flex items-center justify-center gap-2 text-[11px] text-rose-400 font-bold mt-4 uppercase tracking-tighter opacity-80">
+                                <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                                <span>Erro: Jamais separe o sujeito do verbo (mesmo se o sujeito for longo!)</span>
                             </div>
                         </div>
                     </div>
-                </article>
 
-                <hr class="border-border">
-
-                <article id="hifen" class="scroll-mt-24">
-                    <h2 class="font-sans text-3xl font-extrabold text-white mb-6">9. Hífen: Regra dos Ímãs 🧲</h2>
-                    <div class="grid md:grid-cols-3 gap-4 text-center font-sans">
-                        <div class="bg-paper p-6 rounded-xl border border-border group hover:border-success transition">
-                            <div class="text-3xl mb-3">❤️</div>
-                            <h3 class="font-bold text-white mb-2">Opostos se Atraem</h3>
-                            <p class="text-xs text-muted">Vogais diferentes se unem.</p>
-                            <p class="text-success font-bold mt-2">Autoescola</p>
-                        </div>
-                        <div class="bg-paper p-6 rounded-xl border border-border group hover:border-danger transition">
-                            <div class="text-3xl mb-3">💔</div>
-                            <h3 class="font-bold text-white mb-2">Iguais se Repelem</h3>
-                            <p class="text-xs text-muted">Letras iguais brigam.</p>
-                            <p class="text-danger font-bold mt-2">Micro-ondas</p>
-                        </div>
-                        <div class="bg-paper p-6 rounded-xl border border-border group hover:border-warning transition">
-                            <div class="text-3xl mb-3">👥</div>
-                            <h3 class="font-bold text-white mb-2">R e S Duplicam</h3>
-                            <p class="text-xs text-muted">Vogal + R ou S.</p>
-                            <p class="text-warning font-bold mt-2">Minissaia</p>
-                        </div>
-                    </div>
-                </article>
-
-                <hr class="border-border">
-
-                <article id="porques" class="scroll-mt-24">
-                    <h2 class="font-sans text-3xl font-extrabold text-white mb-6">10. Os 4 Porquês</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="bg-paper p-5 rounded-lg border-l-4 border-primary">
-                            <h3 class="text-lg font-bold text-white">Por que <span class="text-xs font-normal text-muted">(Separado, sem acento)</span></h3>
-                            <p class="text-sm text-gray-300 mt-1">Inicio ou meio. Troca por <strong>"Por qual razão"</strong>.</p>
-                        </div>
-                        <div class="bg-paper p-5 rounded-lg border-l-4 border-warning">
-                            <h3 class="text-lg font-bold text-white">Por quê <span class="text-xs font-normal text-muted">(Separado, com acento)</span></h3>
-                            <p class="text-sm text-gray-300 mt-1">Final da frase. Pontuação dá o chapéu 🎩.</p>
-                        </div>
-                        <div class="bg-paper p-5 rounded-lg border-l-4 border-success">
-                            <h3 class="text-lg font-bold text-white">Porque <span class="text-xs font-normal text-muted">(Junto, sem acento)</span></h3>
-                            <p class="text-sm text-gray-300 mt-1">Resposta / Causa. Troca por <strong>"Pois"</strong>.</p>
-                        </div>
-                        <div class="bg-paper p-5 rounded-lg border-l-4 border-danger">
-                            <h3 class="text-lg font-bold text-white">O Porquê <span class="text-xs font-normal text-muted">(Junto, com acento)</span></h3>
-                            <p class="text-sm text-gray-300 mt-1">Substantivo. Vem com artigo "O". O motivo.</p>
-                        </div>
-                    </div>
-                </article>
-
-                <hr class="border-border">
-
-                <article id="se-que" class="scroll-mt-24">
-                    <h2 class="font-sans text-3xl font-extrabold text-white mb-6">11. Funções do SE e QUE</h2>
-                    <div class="space-y-8">
-                        <div class="bg-paper p-6 rounded-xl border border-border">
-                            <h3 class="font-bold text-purple-400 mb-4 font-sans text-xl">O Pesadelo do "SE"</h3>
-                            <div class="grid md:grid-cols-2 gap-6">
-                                <div>
-                                    <strong class="text-white block mb-1">P.A. (Partícula Apassivadora)</strong>
-                                    <p class="text-sm text-gray-400 mb-2">Vende-se casa / Vendem-se casas.</p>
-                                    <ul class="text-xs text-gray-500 list-disc pl-4">
-                                        <li>Aceita plural.</li>
-                                        <li>Verbo VTD (Quem vende, vende algo).</li>
-                                    </ul>
-                                </div>
-                                <div>
-                                    <strong class="text-white block mb-1">I.I.S. (Índice de Indeterminação)</strong>
-                                    <p class="text-sm text-gray-400 mb-2">Precisa-se DE agentes.</p>
-                                    <ul class="text-xs text-gray-500 list-disc pl-4">
-                                        <li>🚫 Trava no singular.</li>
-                                        <li>Tem preposição (VTI).</li>
-                                    </ul>
-                                </div>
-                            </div>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        
+                        <div class="bg-slate-900/30 p-8 rounded-[2rem] border border-emerald-500/10 flex flex-col group hover:border-emerald-500/30 transition-all">
+                            <h4 class="text-emerald-400 font-black mb-8 flex items-center gap-3 text-sm uppercase tracking-widest">
+                                <span class="p-2 bg-emerald-500/10 rounded-lg"><i data-lucide="check-circle-2" class="w-5 h-5"></i></span> 
+                                Luz Verde: Use Sempre
+                            </h4>
+                            <ul class="space-y-4 flex-1">
+                                <li class="bg-white/[0.03] p-4 rounded-xl border border-white/5 hover:bg-emerald-500/[0.02] transition">
+                                    <strong class="text-white block text-sm mb-1">1. Aposto Explicativo</strong>
+                                    <p class="text-sm text-slate-400 italic">"O Brasil<span class="text-emerald-400 font-bold">,</span> gigante pela natureza<span class="text-emerald-400 font-bold">,</span> é lindo."</p>
+                                </li>
+                                <li class="bg-white/[0.03] p-4 rounded-xl border border-white/5">
+                                    <strong class="text-white block text-sm mb-1">2. Vocativo (Chamamento)</strong>
+                                    <p class="text-sm text-slate-400 italic">"Maria<span class="text-emerald-400 font-bold">,</span> venha aqui."</p>
+                                </li>
+                                <li class="bg-white/[0.03] p-4 rounded-xl border border-white/5">
+                                    <strong class="text-white block text-sm mb-1">3. Adjuntos Deslocados</strong>
+                                    <p class="text-sm text-slate-400 italic">"Ontem à noite<span class="text-emerald-400 font-bold">,</span> eu estudei."</p>
+                                    <span class="text-[10px] text-slate-500 uppercase font-bold mt-2 block tracking-tighter">Obrigatória se for longo | Facultativa se for curto</span>
+                                </li>
+                            </ul>
                         </div>
 
-                        <div class="bg-paper p-6 rounded-xl border border-border">
-                            <h3 class="font-bold text-blue-400 mb-4 font-sans text-xl">O "QUE"</h3>
+                        <div class="bg-slate-900/30 p-8 rounded-[2rem] border border-amber-500/10 flex flex-col group hover:border-amber-500/30 transition-all">
+                            <h4 class="text-amber-400 font-black mb-8 flex items-center gap-3 text-sm uppercase tracking-widest text-center">
+                                <span class="p-2 bg-amber-500/10 rounded-lg"><i data-lucide="zap" class="w-5 h-5"></i></span> 
+                                Casos de Elite (FGV)
+                            </h4>
+                            
                             <div class="space-y-4">
-                                <div class="flex items-start gap-3">
-                                    <span class="bg-blue-500/20 text-blue-400 font-bold px-2 py-1 rounded text-xs">PRONOME</span>
-                                    <div>
-                                        <p class="text-white text-sm">Troca por <strong>O QUAL / A QUAL</strong>.</p>
-                                        <p class="text-xs text-muted">"A vaga <em>que</em> eu quero."</p>
+                                <div class="bg-black/40 p-5 rounded-2xl border border-amber-500/20">
+                                    <strong class="text-amber-400 block text-xs uppercase mb-3 tracking-widest">Vírgula antes do "E"</strong>
+                                    <p class="text-sm text-slate-300 leading-relaxed mb-3">Só ocorre se os <span class="text-white font-bold">Sujeitos forem Diferentes</span>.</p>
+                                    <div class="font-mono text-[11px] space-y-2 bg-[#0a0a0a] p-3 rounded-lg border border-white/5">
+                                        <p class="text-emerald-400 flex items-center gap-2"><i data-lucide="check" class="w-3 h-3"></i> "Eu estudei<span class="text-amber-500 font-bold text-base">,</span> e ela passou."</p>
+                                        <p class="text-rose-500/50 flex items-center gap-2 line-through italic"><i data-lucide="x" class="w-3 h-3"></i> "Eu estudei, e eu passei."</p>
                                     </div>
                                 </div>
-                                <div class="flex items-start gap-3">
-                                    <span class="bg-yellow-500/20 text-yellow-400 font-bold px-2 py-1 rounded text-xs">CONJUNÇÃO</span>
-                                    <div>
-                                        <p class="text-white text-sm">Troca a oração inteira por <strong>ISSO</strong>.</p>
-                                        <p class="text-xs text-muted">"Ele disse <em>que passaria</em>." → "Ele disse ISSO."</p>
+
+                                <div class="bg-black/40 p-5 rounded-2xl border border-amber-500/20">
+                                    <strong class="text-amber-400 block text-xs uppercase mb-3 tracking-widest">Vírgula Vicária (Zeugma)</strong>
+                                    <p class="text-sm text-slate-300 leading-relaxed mb-3">A vírgula substitui um <span class="text-white font-bold">verbo omitido</span>.</p>
+                                    <div class="font-mono text-[11px] bg-[#0a0a0a] p-3 rounded-lg border border-white/5">
+                                        <p class="text-slate-200 italic">"Eu gosto de café; ele<span class="text-amber-500 font-bold text-base">,</span> de chá."</p>
+                                        <p class="text-[10px] text-slate-600 mt-2 uppercase">A vírgula "comeu" o verbo "gosta"</p>
                                     </div>
                                 </div>
                             </div>
@@ -548,36 +1018,1067 @@
                     </div>
                 </article>
 
-                <hr class="border-border">
+                <article id="concordancia" class="scroll-mt-32 max-w-5xl mx-auto p-8 bg-[#0f1115] text-slate-100 font-sans rounded-[2rem] shadow-2xl border border-white/10 relative overflow-hidden">
+    
+                    <div class="absolute top-0 right-0 px-6 py-2 bg-blue-600/20 text-blue-400 text-[11px] font-black uppercase tracking-[0.2em] rounded-bl-2xl border-l border-b border-blue-500/20 z-20">
+                        Engine de Concordância
+                    </div>
 
-                <article id="ortografia" class="scroll-mt-24">
-                    <h2 class="font-sans text-3xl font-extrabold text-white mb-6">12. Ortografia FGV</h2>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 font-sans text-center">
-                        <div class="bg-paper p-4 rounded-lg border border-border">
-                            <strong class="text-white block">Paralisação</strong>
-                            <span class="text-xs text-muted">Vem de Parali<strong class="text-primary">S</strong>ia</span>
+                    <header class="mb-12">
+                        <h2 class="text-5xl font-black text-white mb-4 tracking-tight">7. Concordância "Traiçoeira"</h2>
+                        <p class="text-xl text-slate-400 font-medium italic">"Onde o ouvido te engana e a lógica te salva."</p>
+                        <div class="h-1.5 w-24 bg-blue-600 mt-4 rounded-full opacity-50"></div>
+                    </header>
+
+                    <div class="grid md:grid-cols-2 gap-8 font-sans">
+                        
+                        <div class="bg-slate-900/50 rounded-[2.5rem] border border-white/5 overflow-hidden flex flex-col group hover:border-blue-500/30 transition-all">
+                            <div class="p-8 border-b border-white/5 bg-white/[0.02]">
+                                <h3 class="font-black text-white text-xl flex items-center gap-3">
+                                    <span class="p-2 bg-blue-500/10 rounded-xl text-blue-400">
+                                        <i data-lucide="radar" class="w-6 h-6"></i>
+                                    </span>
+                                    1. O Radar do Sujeito
+                                </h3>
+                            </div>
+
+                            <div class="p-8 flex-1 flex flex-col justify-center">
+                                <p class="text-sm text-slate-400 mb-8 leading-relaxed">
+                                    O verbo deve rastrear o sujeito, não importa a distância ou se ele está no final da fila.
+                                </p>
+
+                                <div class="space-y-6">
+                                    <div class="flex items-center gap-4 opacity-40 grayscale group-hover:grayscale-0 transition-all">
+                                        <i data-lucide="x-circle" class="text-rose-500 w-5 h-5"></i>
+                                        <p class="font-mono text-sm tracking-tight italic">"Falta apenas <span class="text-rose-400 underline decoration-wavy">cinco dias</span>."</p>
+                                    </div>
+
+                                    <div class="bg-blue-500/5 p-6 rounded-2xl border border-blue-500/20 relative">
+                                        <div class="flex items-center gap-4">
+                                            <i data-lucide="check-circle" class="text-emerald-500 w-6 h-6"></i>
+                                            <div class="font-mono text-lg font-bold flex flex-wrap items-center gap-2">
+                                                <span class="bg-blue-600 text-white px-2 py-0.5 rounded shadow-[0_0_15px_rgba(37,99,235,0.4)]">Faltam</span>
+                                                <span class="text-slate-500 text-sm italic">... apenas ...</span>
+                                                <span class="bg-blue-600 text-white px-2 py-0.5 rounded shadow-[0_0_15px_rgba(37,99,235,0.4)]">cinco dias</span>
+                                            </div>
+                                        </div>
+                                        <div class="absolute -bottom-1 left-1/4 right-1/4 h-1 bg-blue-500/30 rounded-full"></div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-8 p-3 bg-black/40 rounded-xl text-center border border-white/5">
+                                    <p class="text-[10px] text-blue-400 font-black uppercase tracking-[0.2em]">Dica de Debug</p>
+                                    <p class="text-xs text-slate-500 mt-1 italic">Pergunte ao verbo: "O QUE falta?" ➜ Cinco dias.</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="bg-paper p-4 rounded-lg border border-border">
-                            <strong class="text-white block">Sessão</strong>
-                            <span class="text-xs text-muted">Tempo (Se<strong class="text-primary">x</strong>ta-feira)</span>
+
+                        <div class="bg-slate-900/50 rounded-[2.5rem] border border-white/5 overflow-hidden flex flex-col group hover:border-amber-500/30 transition-all">
+                            <div class="p-8 border-b border-white/5 bg-white/[0.02]">
+                                <h3 class="font-black text-white text-xl flex items-center gap-3">
+                                    <span class="p-2 bg-amber-500/10 rounded-xl text-amber-500">
+                                        <i data-lucide="scale" class="w-6 h-6"></i>
+                                    </span>
+                                    2. A Crise do "Meio"
+                                </h3>
+                            </div>
+
+                            <div class="p-8 space-y-6 flex-1 flex flex-col justify-center">
+                                
+                                <div class="flex items-start gap-4 p-5 rounded-2xl bg-white/[0.03] border border-white/5 hover:bg-amber-500/[0.02] transition">
+                                    <div class="p-2 bg-amber-500/10 rounded-lg text-amber-500">
+                                        <i data-lucide="pie-chart" class="w-5 h-5"></i>
+                                    </div>
+                                    <div>
+                                        <strong class="text-white block text-sm font-black uppercase tracking-widest mb-1">Sentido de Metade</strong>
+                                        <p class="text-[11px] text-slate-500 mb-2">Comporta-se como <span class="text-white">Adjetivo</span> (Varia).</p>
+                                        <p class="text-sm font-mono text-amber-400 font-bold italic">"Bebeu meiA garrafa."</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start gap-4 p-5 rounded-2xl bg-white/[0.03] border border-white/5 hover:bg-slate-500/[0.05] transition">
+                                    <div class="p-2 bg-slate-800 rounded-lg text-slate-400">
+                                        <i data-lucide="anchor" class="w-5 h-5"></i>
+                                    </div>
+                                    <div>
+                                        <strong class="text-white block text-sm font-black uppercase tracking-widest mb-1">Sentido de Um Pouco</strong>
+                                        <p class="text-[11px] text-slate-500 mb-2">Comporta-se como <span class="text-white">Advérbio</span> (Congela).</p>
+                                        <div class="space-y-1">
+                                            <p class="text-sm font-mono text-emerald-400 font-bold">"Ela está meiO cansada."</p>
+                                            <p class="text-[10px] text-rose-500/50 line-through italic italic">"Ela está meia cansada."</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-4 bg-amber-900/20 p-4 rounded-2xl border border-amber-500/20 text-center">
+                                    <p class="text-xs text-amber-200 leading-relaxed font-medium">
+                                        "Meia" cansada = Metade mulher, metade cansaço? <br>
+                                        <span class="text-[10px] text-amber-500/70 font-black uppercase tracking-tighter italic">Lógica de sistema: Erro de Compilação</span>
+                                    </p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="bg-paper p-4 rounded-lg border border-border">
-                            <strong class="text-white block">Seção</strong>
-                            <span class="text-xs text-muted">Corte / Setor</span>
+
+                    </div>
+                </article>
+
+                <article id="acentuacao" class="scroll-mt-32 max-w-5xl mx-auto p-8 bg-[#0f1115] text-slate-100 font-sans rounded-[2rem] shadow-2xl border border-white/10 relative overflow-hidden">
+    
+                    <div class="absolute top-0 right-0 px-6 py-2 bg-blue-600/20 text-blue-400 text-[11px] font-black uppercase tracking-[0.2em] rounded-bl-2xl border-l border-b border-blue-500/20 z-20">
+                        Regras de Acentuação
+                    </div>
+
+                    <header class="mb-12">
+                        <h2 class="text-5xl font-black text-white mb-4 tracking-tight">8. Acentuação Lógica</h2>
+                        <p class="text-xl text-slate-400 font-medium italic">"A guerra das sílabas tônicas: O que uma quer, a outra rejeita."</p>
+                        <div class="h-1.5 w-24 bg-blue-600 mt-4 rounded-full opacity-50"></div>
+                    </header>
+
+                    <div class="grid md:grid-cols-2 gap-8 items-stretch">
+                        
+                        <div class="bg-slate-900/50 rounded-[2.5rem] border border-white/5 overflow-hidden flex flex-col group hover:border-emerald-500/30 transition-all">
+                            <div class="p-8 border-b border-white/5 bg-white/[0.02] flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-black text-white text-2xl flex items-center gap-3">
+                                        <span class="p-2 bg-emerald-500/10 rounded-xl text-emerald-500">
+                                            <i data-lucide="arrow-right-to-line" class="w-6 h-6"></i>
+                                        </span>
+                                        Oxítonas
+                                    </h3>
+                                    <p class="text-xs text-emerald-400 font-bold uppercase tracking-widest mt-2 ml-1">Última Forte</p>
+                                </div>
+                            </div>
+
+                            <div class="p-8 flex-1 flex flex-col justify-between space-y-8">
+                                <div>
+                                    <strong class="text-white text-sm block mb-4 uppercase tracking-widest opacity-60">Acentua Terminadas em:</strong>
+                                    <div class="flex flex-wrap gap-2">
+                                        <span class="px-4 py-2 bg-emerald-500/10 text-emerald-400 rounded-lg font-black border border-emerald-500/20">A(s)</span>
+                                        <span class="px-4 py-2 bg-emerald-500/10 text-emerald-400 rounded-lg font-black border border-emerald-500/20">E(s)</span>
+                                        <span class="px-4 py-2 bg-emerald-500/10 text-emerald-400 rounded-lg font-black border border-emerald-500/20">O(s)</span>
+                                        <span class="px-4 py-2 bg-emerald-500/10 text-emerald-400 rounded-lg font-black border border-emerald-500/20">EM/ENS</span>
+                                    </div>
+                                    <p class="text-xs text-slate-500 mt-3 italic">Ex: Café, Sofá, Armazém, Parabéns.</p>
+                                </div>
+
+                                <div class="p-4 bg-black/40 rounded-2xl border border-white/5">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <i data-lucide="ban" class="w-4 h-4 text-rose-500"></i>
+                                        <strong class="text-rose-500 text-xs uppercase font-bold">Não Acentua:</strong>
+                                    </div>
+                                    <p class="text-sm text-slate-300">Terminadas em <span class="text-white font-bold">I</span> ou <span class="text-white font-bold">U</span>.</p>
+                                    <p class="text-[10px] text-slate-500 mt-1">Ex: Caju, Saci.</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="bg-paper p-4 rounded-lg border border-border">
-                            <strong class="text-white block">Cessão</strong>
-                            <span class="text-xs text-muted">Ceder / Dar</span>
+
+                        <div class="bg-slate-900/50 rounded-[2.5rem] border border-white/5 overflow-hidden flex flex-col group hover:border-rose-500/30 transition-all">
+                            <div class="p-8 border-b border-white/5 bg-white/[0.02] flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-black text-white text-2xl flex items-center gap-3">
+                                        <span class="p-2 bg-rose-500/10 rounded-xl text-rose-500">
+                                            <i data-lucide="arrow-left-to-line" class="w-6 h-6"></i>
+                                        </span>
+                                        Paroxítonas
+                                    </h3>
+                                    <p class="text-xs text-rose-400 font-bold uppercase tracking-widest mt-2 ml-1">Penúltima Forte</p>
+                                </div>
+                            </div>
+
+                            <div class="p-8 flex-1 flex flex-col justify-between space-y-8">
+                                <div>
+                                    <strong class="text-white text-sm block mb-4 uppercase tracking-widest opacity-60">Acentua Terminadas em:</strong>
+                                    <p class="text-sm text-slate-300 mb-3 font-medium">Tudo que as Oxítonas <span class="text-rose-400 font-bold">REJEITAM</span>.</p>
+                                    <div class="flex flex-wrap gap-2">
+                                        <span class="px-3 py-1 bg-rose-500/10 text-rose-400 rounded text-xs font-bold border border-rose-500/20">L</span>
+                                        <span class="px-3 py-1 bg-rose-500/10 text-rose-400 rounded text-xs font-bold border border-rose-500/20">R</span>
+                                        <span class="px-3 py-1 bg-rose-500/10 text-rose-400 rounded text-xs font-bold border border-rose-500/20">N</span>
+                                        <span class="px-3 py-1 bg-rose-500/10 text-rose-400 rounded text-xs font-bold border border-rose-500/20">X</span>
+                                        <span class="px-3 py-1 bg-rose-500/10 text-rose-400 rounded text-xs font-bold border border-rose-500/20">PS</span>
+                                        <span class="px-3 py-1 bg-rose-500/10 text-rose-400 rounded text-xs font-bold border border-rose-500/20">I/U</span>
+                                        <span class="px-3 py-1 bg-rose-500/10 text-rose-400 rounded text-xs font-bold border border-rose-500/20">ÃO</span>
+                                    </div>
+                                    <p class="text-xs text-slate-500 mt-3 italic">Ex: Táxi, Vírus, Órfão, Fácil.</p>
+                                </div>
+
+                                <div class="p-4 bg-black/40 rounded-2xl border border-white/5">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <i data-lucide="ban" class="w-4 h-4 text-emerald-500"></i>
+                                        <strong class="text-emerald-500 text-xs uppercase font-bold">Não Acentua:</strong>
+                                    </div>
+                                    <p class="text-sm text-slate-300">As terminações de Oxítonas (A, E, O, EM).</p>
+                                    <p class="text-[10px] text-slate-500 mt-1">Ex: Mesa, Homem.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="mt-8 bg-purple-900/20 border border-purple-500/30 p-8 rounded-[2rem] flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/20 blur-3xl rounded-full pointer-events-none"></div>
+
+                        <div class="flex items-center gap-4 relative z-10">
+                            <div class="p-3 bg-purple-500 rounded-xl shadow-[0_0_20px_rgba(168,85,247,0.4)] text-white">
+                                <i data-lucide="crown" class="w-8 h-8"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-black text-2xl tracking-tight">Proparoxítonas</h4>
+                                <p class="text-sm text-purple-200">Antepenúltima sílaba forte.</p>
+                            </div>
+                        </div>
+
+                        <div class="text-center md:text-right relative z-10">
+                            <span class="text-4xl font-black text-white block tracking-tighter drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]">TODAS</span>
+                            <span class="text-xs text-purple-300 font-bold uppercase tracking-[0.3em] block mt-1">São Acentuadas</span>
                         </div>
                     </div>
                 </article>
 
-            </div>
-        </main>
-    </div>
 
-    <script>
+                <article id="hifen" class="scroll-mt-32 max-w-5xl mx-auto p-8 bg-[#0f1115] text-slate-100 font-sans rounded-[2rem] shadow-2xl border border-white/10 relative overflow-hidden">
+    
+                    <div class="absolute top-0 right-0 px-6 py-2 bg-blue-600/20 text-blue-400 text-[11px] font-black uppercase tracking-[0.2em] rounded-bl-2xl border-l border-b border-blue-500/20 z-20">
+                        Física da Ortografia
+                    </div>
+
+                    <header class="mb-12">
+                        <h2 class="text-5xl font-black text-white mb-4 tracking-tight">9. Hífen: A Regra dos Ímãs 🧲</h2>
+                        <p class="text-xl text-slate-400 font-medium italic">"Os opostos se atraem, os iguais se repelem."</p>
+                        <div class="h-1.5 w-24 bg-blue-600 mt-4 rounded-full opacity-50"></div>
+                    </header>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 font-sans">
+                        
+                        <div class="bg-slate-900/50 rounded-[2.5rem] border border-white/5 overflow-hidden flex flex-col group hover:border-emerald-500/30 transition-all">
+                            <div class="p-8 border-b border-white/5 bg-white/[0.02] flex items-center gap-4">
+                                <div class="bg-emerald-500/10 p-3 rounded-xl text-emerald-500">
+                                    <i data-lucide="magnet" class="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-black text-white text-xl">Opostos se Atraem</h3>
+                                    <p class="text-[10px] uppercase font-bold text-emerald-500 tracking-widest mt-1">Junta Tudo</p>
+                                </div>
+                            </div>
+                            
+                            <div class="p-8 flex-1 flex flex-col justify-center space-y-4">
+                                <p class="text-sm text-slate-400 mb-2">Letras diferentes? O magnetismo cola as palavras.</p>
+                                
+                                <div class="bg-black/40 p-4 rounded-2xl border border-white/5 flex items-center justify-between">
+                                    <div class="text-slate-500 font-mono text-sm">Auto <span class="text-white">+</span> Escola</div>
+                                    <i data-lucide="arrow-right" class="w-4 h-4 text-emerald-500/50"></i>
+                                    <div class="text-emerald-400 font-bold text-lg tracking-tight">Autoescola</div>
+                                </div>
+
+                                <div class="bg-black/40 p-4 rounded-2xl border border-white/5 flex items-center justify-between">
+                                    <div class="text-slate-500 font-mono text-sm">Extra <span class="text-white">+</span> Oficial</div>
+                                    <i data-lucide="arrow-right" class="w-4 h-4 text-emerald-500/50"></i>
+                                    <div class="text-emerald-400 font-bold text-lg tracking-tight">Extraoficial</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-900/50 rounded-[2.5rem] border border-white/5 overflow-hidden flex flex-col group hover:border-rose-500/30 transition-all">
+                            <div class="p-8 border-b border-white/5 bg-white/[0.02] flex items-center gap-4">
+                                <div class="bg-rose-500/10 p-3 rounded-xl text-rose-500">
+                                    <i data-lucide="split" class="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-black text-white text-xl">Iguais se Repelem</h3>
+                                    <p class="text-[10px] uppercase font-bold text-rose-500 tracking-widest mt-1">Separa com Hífen</p>
+                                </div>
+                            </div>
+                            
+                            <div class="p-8 flex-1 flex flex-col justify-center space-y-4">
+                                <p class="text-sm text-slate-400 mb-2">Letras iguais? Elas brigam. O hífen é o escudo.</p>
+                                
+                                <div class="bg-black/40 p-4 rounded-2xl border border-white/5 flex items-center justify-between">
+                                    <div class="text-slate-500 font-mono text-sm">Micro <span class="text-white">+</span> Ondas</div>
+                                    <i data-lucide="arrow-right" class="w-4 h-4 text-rose-500/50"></i>
+                                    <div class="text-rose-400 font-bold text-lg tracking-tight">Micro-ondas</div>
+                                </div>
+
+                                <div class="bg-black/40 p-4 rounded-2xl border border-white/5 flex items-center justify-between">
+                                    <div class="text-slate-500 font-mono text-sm">Anti <span class="text-white">+</span> Inflamatório</div>
+                                    <i data-lucide="arrow-right" class="w-4 h-4 text-rose-500/50"></i>
+                                    <div class="text-rose-400 font-bold text-lg tracking-tight">Anti-inflamatório</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-900/50 rounded-[2.5rem] border border-white/5 overflow-hidden flex flex-col group hover:border-amber-500/30 transition-all">
+                            <div class="p-8 border-b border-white/5 bg-white/[0.02] flex items-center gap-4">
+                                <div class="bg-amber-500/10 p-3 rounded-xl text-amber-500">
+                                    <i data-lucide="copy" class="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-black text-white text-xl">R e S Duplicam</h3>
+                                    <p class="text-[10px] uppercase font-bold text-amber-500 tracking-widest mt-1">Dobra a Consoante</p>
+                                </div>
+                            </div>
+                            
+                            <div class="p-8 flex-1 flex flex-col justify-center space-y-4">
+                                <p class="text-sm text-slate-400 mb-2">Vogal encontra R ou S? Para o som não mudar, dobre a letra.</p>
+                                
+                                <div class="bg-black/40 p-4 rounded-2xl border border-white/5 flex items-center justify-between">
+                                    <div class="text-slate-500 font-mono text-sm">Mini <span class="text-white">+</span> Saia</div>
+                                    <i data-lucide="arrow-right" class="w-4 h-4 text-amber-500/50"></i>
+                                    <div class="text-amber-400 font-bold text-lg tracking-tight">Minissaia</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-900/50 rounded-[2.5rem] border border-white/5 overflow-hidden flex flex-col group hover:border-slate-500/30 transition-all">
+                            <div class="p-8 border-b border-white/5 bg-white/[0.02] flex items-center gap-4">
+                                <div class="bg-slate-700/50 p-3 rounded-xl text-white">
+                                    <i data-lucide="brick-wall" class="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-black text-white text-xl">O "H" é Muro</h3>
+                                    <p class="text-[10px] uppercase font-bold text-slate-400 tracking-widest mt-1">Sempre Separa</p>
+                                </div>
+                            </div>
+                            
+                            <div class="p-8 flex-1 flex flex-col justify-center space-y-4">
+                                <p class="text-sm text-slate-400 mb-2">O H não se mistura. Se ele aparecer, coloque hífen.</p>
+                                
+                                <div class="bg-black/40 p-4 rounded-2xl border border-white/5 flex items-center justify-between">
+                                    <div class="text-slate-500 font-mono text-sm">Super <span class="text-white">+</span> Homem</div>
+                                    <i data-lucide="arrow-right" class="w-4 h-4 text-slate-500/50"></i>
+                                    <div class="text-white font-bold text-lg tracking-tight">Super-homem</div>
+                                </div>
+
+                                <div class="bg-black/40 p-4 rounded-2xl border border-white/5 flex items-center justify-between">
+                                    <div class="text-slate-500 font-mono text-sm">Anti <span class="text-white">+</span> Higiênico</div>
+                                    <i data-lucide="arrow-right" class="w-4 h-4 text-slate-500/50"></i>
+                                    <div class="text-white font-bold text-lg tracking-tight">Anti-higiênico</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </article>
+
+
+            
+               <article id="porques" class="scroll-mt-32 max-w-5xl mx-auto p-8 bg-[#0f1115] text-slate-100 font-sans rounded-[2rem] shadow-2xl border border-white/10 relative overflow-hidden">
+    
+                    <div class="absolute top-0 right-0 px-6 py-2 bg-blue-600/20 text-blue-400 text-[11px] font-black uppercase tracking-[0.2em] rounded-bl-2xl border-l border-b border-blue-500/20 z-20">
+                        Operadores Lógicos
+                    </div>
+
+                    <header class="mb-12">
+                        <h2 class="text-5xl font-black text-white mb-4 tracking-tight">10. Os 4 Porquês</h2>
+                        <p class="text-xl text-slate-400 font-medium italic">"Pare de chutar. Use a lógica da substituição."</p>
+                        <div class="h-1.5 w-24 bg-blue-600 mt-4 rounded-full opacity-50"></div>
+                    </header>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 font-sans">
+                        
+                        <div class="bg-slate-900/50 rounded-[2.5rem] border border-white/5 overflow-hidden flex flex-col group hover:border-blue-500/30 transition-all">
+                            <div class="p-8 border-b border-white/5 bg-white/[0.02] flex items-center gap-4">
+                                <div class="bg-blue-500/10 p-3 rounded-xl text-blue-500">
+                                    <i data-lucide="help-circle" class="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-black text-white text-2xl tracking-tight">Por que</h3>
+                                    <p class="text-[10px] uppercase font-bold text-blue-500 tracking-widest mt-1">Separado e Sem Acento</p>
+                                </div>
+                            </div>
+                            <div class="p-8 flex-1 space-y-6">
+                                <p class="text-sm text-slate-400">Usado para perguntas (início) ou como pronome relativo.</p>
+                                
+                                <div class="space-y-3">
+                                    <div class="bg-black/40 p-4 rounded-2xl border border-white/5 flex flex-col">
+                                        <span class="text-[10px] text-slate-500 uppercase font-bold mb-1">Modo Pergunta</span>
+                                        <div class="font-mono text-sm">
+                                            <span class="text-slate-500">Troca por:</span> <span class="text-blue-400 font-bold">Por qual razão</span>
+                                        </div>
+                                    </div>
+                                    <div class="bg-black/40 p-4 rounded-2xl border border-white/5 flex flex-col">
+                                        <span class="text-[10px] text-slate-500 uppercase font-bold mb-1">Modo Relativo</span>
+                                        <div class="font-mono text-sm">
+                                            <span class="text-slate-500">Troca por:</span> <span class="text-blue-400 font-bold">Pelo qual</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-900/50 rounded-[2.5rem] border border-white/5 overflow-hidden flex flex-col group hover:border-emerald-500/30 transition-all">
+                            <div class="p-8 border-b border-white/5 bg-white/[0.02] flex items-center gap-4">
+                                <div class="bg-emerald-500/10 p-3 rounded-xl text-emerald-500">
+                                    <i data-lucide="message-circle" class="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-black text-white text-2xl tracking-tight">Porque</h3>
+                                    <p class="text-[10px] uppercase font-bold text-emerald-500 tracking-widest mt-1">Junto e Sem Acento</p>
+                                </div>
+                            </div>
+                            <div class="p-8 flex-1 space-y-6">
+                                <p class="text-sm text-slate-400">Usado para respostas, explicações ou causas.</p>
+                                
+                                <div class="bg-black/40 p-4 rounded-2xl border border-white/5 flex flex-col justify-center h-full">
+                                    <span class="text-[10px] text-slate-500 uppercase font-bold mb-2">Conector Lógico</span>
+                                    <div class="flex items-center gap-3">
+                                        <i data-lucide="refresh-cw" class="w-4 h-4 text-emerald-500/50"></i>
+                                        <div class="font-mono text-sm">
+                                            <span class="text-slate-500">Troca por:</span> <span class="text-emerald-400 font-bold text-lg">Pois / Já que</span>
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-slate-500 mt-4 italic">"Não fui <span class="text-emerald-500">porque</span> (pois) estava doente."</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-900/50 rounded-[2.5rem] border border-white/5 overflow-hidden flex flex-col group hover:border-amber-500/30 transition-all">
+                            <div class="p-8 border-b border-white/5 bg-white/[0.02] flex items-center gap-4">
+                                <div class="bg-amber-500/10 p-3 rounded-xl text-amber-500">
+                                    <i data-lucide="arrow-bar-to-right" class="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-black text-white text-2xl tracking-tight">Por quê</h3>
+                                    <p class="text-[10px] uppercase font-bold text-amber-500 tracking-widest mt-1">Separado e Com Acento</p>
+                                </div>
+                            </div>
+                            <div class="p-8 flex-1 space-y-6">
+                                <p class="text-sm text-slate-400">O "E" ganha acento quando bate na parede da pontuação.</p>
+                                
+                                <div class="bg-black/40 p-5 rounded-2xl border border-white/5 text-center relative overflow-hidden">
+                                    <div class="absolute right-0 top-0 bottom-0 w-1 bg-amber-500/50"></div>
+                                    <p class="font-mono text-lg text-slate-300">
+                                        "Você não comeu? <span class="text-amber-500 font-bold">Por quê</span><span class="text-white font-black text-2xl">?</span>"
+                                    </p>
+                                    <p class="text-[10px] text-amber-500 uppercase font-bold mt-3 tracking-widest">
+                                        <i data-lucide="arrow-up" class="w-3 h-3 inline"></i> Vizinho de Pontuação (. ? !)
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-900/50 rounded-[2.5rem] border border-white/5 overflow-hidden flex flex-col group hover:border-purple-500/30 transition-all">
+                            <div class="p-8 border-b border-white/5 bg-white/[0.02] flex items-center gap-4">
+                                <div class="bg-purple-500/10 p-3 rounded-xl text-purple-500">
+                                    <i data-lucide="box" class="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-black text-white text-2xl tracking-tight">O Porquê</h3>
+                                    <p class="text-[10px] uppercase font-bold text-purple-500 tracking-widest mt-1">Junto e Com Acento</p>
+                                </div>
+                            </div>
+                            <div class="p-8 flex-1 space-y-6">
+                                <p class="text-sm text-slate-400">Virou um substantivo (uma "coisa"). Tem artigo antes.</p>
+                                
+                                <div class="bg-black/40 p-5 rounded-2xl border border-white/5 flex flex-col items-center">
+                                    <div class="flex items-center gap-2 font-mono text-lg">
+                                        <span class="px-2 py-1 bg-purple-500 rounded text-white font-bold shadow-[0_0_15px_rgba(168,85,247,0.5)]">O</span>
+                                        <span class="text-purple-400 font-bold">Porquê</span>
+                                    </div>
+                                    <div class="h-px w-full bg-white/10 my-3"></div>
+                                    <div class="font-mono text-sm">
+                                        <span class="text-slate-500">Troca por:</span> <span class="text-purple-400 font-bold">O Motivo</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="mt-8 bg-black/20 border border-white/5 p-6 rounded-[1.5rem] flex flex-wrap justify-center gap-4 md:gap-8 text-xs font-mono text-slate-500">
+                        <span class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-blue-500"></div> Pergunta = Separado</span>
+                        <span class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-emerald-500"></div> Resposta = Junto</span>
+                        <span class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-amber-500"></div> Pontuação = Acento</span>
+                        <span class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-purple-500"></div> Substantivo = O + Junto</span>
+                    </div>
+
+                </article>
+
+                <article id="se-que" class="scroll-mt-32 max-w-5xl mx-auto p-8 bg-[#0f1115] text-slate-100 font-sans rounded-[2rem] shadow-2xl border border-white/10 relative overflow-hidden">
+    
+                    <div class="absolute top-0 right-0 px-6 py-2 bg-blue-600/20 text-blue-400 text-[11px] font-black uppercase tracking-[0.2em] rounded-bl-2xl border-l border-b border-blue-500/20 z-20">
+                        Análise Sintática Avançada
+                    </div>
+
+                    <header class="mb-12">
+                        <h2 class="text-5xl font-black text-white mb-4 tracking-tight">11. Funções do SE e QUE</h2>
+                        <p class="text-xl text-slate-400 font-medium italic">"Os campeões de audiência da FGV explicados via lógica."</p>
+                        <div class="h-1.5 w-24 bg-blue-600 mt-4 rounded-full opacity-50"></div>
+                    </header>
+
+                    <div class="space-y-16">
+                        
+                        <div>
+                            <div class="flex items-center gap-3 mb-8">
+                                <span class="bg-purple-500/10 text-purple-400 p-3 rounded-xl border border-purple-500/20">
+                                    <i data-lucide="split" class="w-6 h-6"></i>
+                                </span>
+                                <h3 class="font-black text-white text-3xl tracking-tight">O Dilema do "SE"</h3>
+                            </div>
+
+                            <div class="grid md:grid-cols-2 gap-8 font-sans">
+                                
+                                <div class="bg-slate-900/50 rounded-[2.5rem] border border-white/5 overflow-hidden flex flex-col group hover:border-purple-400/30 transition-all relative">
+                                    <div class="absolute -right-6 -top-6 text-purple-500/5 group-hover:text-purple-500/10 transition-colors">
+                                        <i data-lucide="unlock" class="w-32 h-32"></i>
+                                    </div>
+
+                                    <div class="p-8 border-b border-white/5 bg-white/[0.02]">
+                                        <h4 class="text-purple-400 font-black text-xl mb-1">P.A. (Apassivadora)</h4>
+                                        <p class="text-[10px] uppercase font-bold text-slate-500 tracking-widest">A porta está aberta</p>
+                                    </div>
+
+                                    <div class="p-8 flex-1 space-y-6 relative z-10">
+                                        <ul class="space-y-4">
+                                            <li class="flex items-start gap-3">
+                                                <div class="bg-emerald-500/10 p-1 rounded text-emerald-500 mt-0.5"><i data-lucide="check" class="w-4 h-4"></i></div>
+                                                <div>
+                                                    <strong class="text-slate-200 text-sm block">Aceita Plural</strong>
+                                                    <p class="text-xs text-slate-500">O verbo concorda com o sujeito (alvo).</p>
+                                                </div>
+                                            </li>
+                                            <li class="flex items-start gap-3">
+                                                <div class="bg-rose-500/10 p-1 rounded text-rose-500 mt-0.5"><i data-lucide="x" class="w-4 h-4"></i></div>
+                                                <div>
+                                                    <strong class="text-slate-200 text-sm block">Sem Preposição</strong>
+                                                    <p class="text-xs text-slate-500">Caminho livre (Transitivo Direto).</p>
+                                                </div>
+                                            </li>
+                                        </ul>
+
+                                        <div class="bg-black/40 p-4 rounded-2xl border border-purple-500/20 text-center">
+                                            <p class="text-lg font-mono text-slate-300">"Vendem-<span class="text-purple-400 font-bold">se</span> casas."</p>
+                                            <div class="h-px w-1/2 bg-white/10 mx-auto my-2"></div>
+                                            <p class="text-[10px] text-slate-500 uppercase font-bold">(Casas são vendidas)</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-slate-900/50 rounded-[2.5rem] border border-white/5 overflow-hidden flex flex-col group hover:border-pink-500/30 transition-all relative">
+                                    <div class="absolute -right-6 -top-6 text-pink-500/5 group-hover:text-pink-500/10 transition-colors">
+                                        <i data-lucide="lock" class="w-32 h-32"></i>
+                                    </div>
+
+                                    <div class="p-8 border-b border-white/5 bg-white/[0.02]">
+                                        <h4 class="text-pink-500 font-black text-xl mb-1">I.I.S. (Indeterminação)</h4>
+                                        <p class="text-[10px] uppercase font-bold text-slate-500 tracking-widest">Cadeado no Singular</p>
+                                    </div>
+
+                                    <div class="p-8 flex-1 space-y-6 relative z-10">
+                                        <ul class="space-y-4">
+                                            <li class="flex items-start gap-3">
+                                                <div class="bg-pink-500/10 p-1 rounded text-pink-500 mt-0.5"><i data-lucide="lock" class="w-4 h-4"></i></div>
+                                                <div>
+                                                    <strong class="text-slate-200 text-sm block">Travado no Singular</strong>
+                                                    <p class="text-xs text-slate-500">Jamais vai para o plural.</p>
+                                                </div>
+                                            </li>
+                                            <li class="flex items-start gap-3">
+                                                <div class="bg-blue-500/10 p-1 rounded text-blue-500 mt-0.5"><i data-lucide="shield" class="w-4 h-4"></i></div>
+                                                <div>
+                                                    <strong class="text-slate-200 text-sm block">Exige Preposição</strong>
+                                                    <p class="text-xs text-slate-500">Tem uma barreira (Transitivo Indireto).</p>
+                                                </div>
+                                            </li>
+                                        </ul>
+
+                                        <div class="bg-black/40 p-4 rounded-2xl border border-pink-500/20 text-center">
+                                            <p class="text-lg font-mono text-slate-300">
+                                                "Precisa-<span class="text-pink-500 font-bold">se</span> <span class="bg-pink-500 text-white px-1 rounded text-sm font-bold shadow-[0_0_10px_rgba(236,72,153,0.5)]">DE</span> agentes."
+                                            </p>
+                                            <div class="h-px w-1/2 bg-white/10 mx-auto my-2"></div>
+                                            <p class="text-[10px] text-slate-500 uppercase font-bold">(Sujeito Indeterminado)</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex items-center gap-3 mb-8">
+                                <span class="bg-blue-500/10 text-blue-400 p-3 rounded-xl border border-blue-500/20">
+                                    <i data-lucide="code-2" class="w-6 h-6"></i>
+                                </span>
+                                <h3 class="font-black text-white text-3xl tracking-tight">Quem é o "QUE"?</h3>
+                            </div>
+
+                            <div class="grid md:grid-cols-2 gap-8">
+                                
+                                <div class="bg-slate-900/50 rounded-[2.5rem] border border-white/5 overflow-hidden flex flex-col group hover:border-blue-500/30 transition-all">
+                                    <div class="p-8 border-b border-white/5 bg-white/[0.02] flex justify-between items-start">
+                                        <div>
+                                            <strong class="text-blue-400 text-lg block font-black">Pronome Relativo</strong>
+                                            <p class="text-[10px] uppercase font-bold text-slate-500 tracking-widest mt-1">Ponteiro (Pointer)</p>
+                                        </div>
+                                        <span class="bg-blue-500/10 text-blue-300 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded border border-blue-500/20">Retoma Anterior</span>
+                                    </div>
+                                    
+                                    <div class="p-8 flex-1 space-y-6">
+                                        <p class="text-sm text-slate-400">Funciona como um retrovisor. Ele aponta para um nome que veio antes.</p>
+                                        
+                                        <div class="bg-black/40 p-5 rounded-2xl border border-blue-500/20 flex flex-col items-center">
+                                            <div class="flex items-center gap-2 mb-4">
+                                                <i data-lucide="refresh-cw" class="w-4 h-4 text-blue-500"></i>
+                                                <span class="text-xs text-slate-400 uppercase font-bold">Troca por:</span>
+                                                <strong class="text-blue-400 font-black">O QUAL / A QUAL</strong>
+                                            </div>
+                                            
+                                            <div class="font-mono text-base text-center">
+                                                "O cargo <span class="text-blue-400 font-black underline decoration-2 decoration-blue-500 underline-offset-4">que</span> quero."
+                                            </div>
+                                            <div class="text-[10px] text-slate-600 mt-2 font-mono uppercase">
+                                                (O cargo <span class="text-blue-400">o qual</span> quero)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-slate-900/50 rounded-[2.5rem] border border-white/5 overflow-hidden flex flex-col group hover:border-amber-500/30 transition-all">
+                                    <div class="p-8 border-b border-white/5 bg-white/[0.02] flex justify-between items-start">
+                                        <div>
+                                            <strong class="text-amber-400 text-lg block font-black">Conjunção Integrante</strong>
+                                            <p class="text-[10px] uppercase font-bold text-slate-500 tracking-widest mt-1">Conector (Link)</p>
+                                        </div>
+                                        <span class="bg-amber-500/10 text-amber-300 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded border border-amber-500/20">Inicia Oração</span>
+                                    </div>
+                                    
+                                    <div class="p-8 flex-1 space-y-6">
+                                        <p class="text-sm text-slate-400">Introduz um bloco inteiro de informação (oração substantiva).</p>
+                                        
+                                        <div class="bg-black/40 p-5 rounded-2xl border border-amber-500/20 flex flex-col items-center">
+                                            <div class="flex items-center gap-2 mb-4">
+                                                <i data-lucide="box" class="w-4 h-4 text-amber-500"></i>
+                                                <span class="text-xs text-slate-400 uppercase font-bold">Troca tudo por:</span>
+                                                <strong class="text-amber-400 font-black">ISSO</strong>
+                                            </div>
+                                            
+                                            <div class="font-mono text-base text-center">
+                                                "Ele disse <span class="bg-amber-500/10 text-amber-300 px-1 rounded">[que passaria]</span>."
+                                            </div>
+                                            <div class="text-[10px] text-slate-600 mt-2 font-mono uppercase">
+                                                (Ele disse <span class="text-amber-400 font-bold">ISSO</span>)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </article>
+
+                <article id="ortografia" class="scroll-mt-32 max-w-5xl mx-auto p-8 bg-[#0f1115] text-slate-100 font-sans rounded-[2rem] shadow-2xl border border-white/10 relative overflow-hidden">
+    
+                    <div class="absolute top-0 right-0 px-6 py-2 bg-blue-600/20 text-blue-400 text-[11px] font-black uppercase tracking-[0.2em] rounded-bl-2xl border-l border-b border-blue-500/20 z-20">
+                        Source Code da Língua
+                    </div>
+
+                    <header class="mb-12">
+                        <h2 class="text-5xl font-black text-white mb-4 tracking-tight">12. Ortografia FGV</h2>
+                        <p class="text-xl text-slate-400 font-medium italic">"Não decore a grafia. Entenda a origem do código."</p>
+                        <div class="h-1.5 w-24 bg-blue-600 mt-4 rounded-full opacity-50"></div>
+                    </header>
+
+                    <div class="space-y-12">
+
+                        <div class="bg-slate-900/50 rounded-[2.5rem] border border-white/5 overflow-hidden flex flex-col group hover:border-blue-500/30 transition-all">
+                            <div class="p-8 border-b border-white/5 bg-white/[0.02] flex items-center gap-4">
+                                <div class="bg-blue-500/10 p-3 rounded-xl text-blue-500">
+                                    <i data-lucide="git-branch" class="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-black text-white text-2xl tracking-tight">A Regra da Herança</h3>
+                                    <p class="text-[10px] uppercase font-bold text-blue-500 tracking-widest mt-1">S ou Z? Olhe a Classe Pai</p>
+                                </div>
+                            </div>
+
+                            <div class="p-8 flex-1 grid md:grid-cols-2 gap-8 items-center">
+                                <div class="space-y-4">
+                                    <p class="text-sm text-slate-400">Se a palavra original (Classe Pai) tem <strong>S</strong>, a derivada (Classe Filha) <span class="text-blue-400 font-bold">herda</span> o <strong>S</strong>.</p>
+                                    
+                                    <div class="bg-black/40 p-5 rounded-2xl border border-blue-500/20 flex items-center justify-between font-mono">
+                                        <span class="text-slate-500">Parali<strong class="text-white text-lg">s</strong>ia</span>
+                                        <i data-lucide="arrow-right" class="w-4 h-4 text-blue-500"></i>
+                                        <span class="text-blue-400 font-bold">Parali<span class="text-white text-lg underline decoration-blue-500 underline-offset-4">s</span>ação</span>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white/[0.02] p-6 rounded-2xl border border-white/5 space-y-3">
+                                    <p class="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-2">Exemplos de Herança:</p>
+                                    <div class="flex items-center gap-2 text-sm font-mono text-slate-300">
+                                        <i data-lucide="check" class="w-3 h-3 text-emerald-500"></i>
+                                        Pesqui<strong class="text-white">s</strong>a <span class="text-slate-600">-></span> Pesqui<strong class="text-blue-400">s</strong>ar
+                                    </div>
+                                    <div class="flex items-center gap-2 text-sm font-mono text-slate-300">
+                                        <i data-lucide="check" class="w-3 h-3 text-emerald-500"></i>
+                                        Análi<strong class="text-white">s</strong>e <span class="text-slate-600">-></span> Anali<strong class="text-blue-400">s</strong>ar
+                                    </div>
+                                    <div class="h-px w-full bg-white/5 my-1"></div>
+                                    <div class="flex items-center gap-2 text-sm font-mono text-rose-300/80">
+                                        <i data-lucide="alert-triangle" class="w-3 h-3 text-rose-500"></i>
+                                        Atua<strong class="text-rose-500">l</strong> (Sem S) <span class="text-slate-600">-></span> Atuali<strong class="text-rose-500">z</strong>ar
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid md:grid-cols-3 gap-6">
+                            
+                            <div class="bg-slate-900/50 rounded-[2.5rem] border border-white/5 overflow-hidden flex flex-col group hover:border-amber-500/30 transition-all">
+                                <div class="p-8 flex-1 flex flex-col items-center text-center space-y-4">
+                                    <div class="bg-amber-500/10 p-4 rounded-2xl text-amber-500 group-hover:scale-110 transition-transform duration-300">
+                                        <i data-lucide="clock" class="w-8 h-8"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-black text-white text-2xl tracking-tight">Sessão</h3>
+                                        <p class="text-[10px] uppercase font-bold text-amber-500 tracking-widest mt-1">Tempo / Reunião</p>
+                                    </div>
+                                    <div class="w-full h-px bg-white/5"></div>
+                                    <p class="text-sm text-slate-400 leading-relaxed">
+                                        Vem de "Sentar". É o intervalo de tempo que você permanece sentado.
+                                    </p>
+                                    <p class="text-xs text-slate-500 italic bg-black/20 px-3 py-1 rounded-full">"Sessão de cinema"</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-900/50 rounded-[2.5rem] border border-white/5 overflow-hidden flex flex-col group hover:border-rose-500/30 transition-all">
+                                <div class="p-8 flex-1 flex flex-col items-center text-center space-y-4">
+                                    <div class="bg-rose-500/10 p-4 rounded-2xl text-rose-500 group-hover:scale-110 transition-transform duration-300">
+                                        <i data-lucide="scissors" class="w-8 h-8"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-black text-white text-2xl tracking-tight">Seção</h3>
+                                        <p class="text-[10px] uppercase font-bold text-rose-500 tracking-widest mt-1">Corte / Divisão</p>
+                                    </div>
+                                    <div class="w-full h-px bg-white/5"></div>
+                                    <p class="text-sm text-slate-400 leading-relaxed">
+                                        Vem de "Secar" (Cortar). É uma parte de um todo, um setor ou departamento.
+                                    </p>
+                                    <p class="text-xs text-slate-500 italic bg-black/20 px-3 py-1 rounded-full">"Seção Eleitoral"</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-900/50 rounded-[2.5rem] border border-white/5 overflow-hidden flex flex-col group hover:border-emerald-500/30 transition-all">
+                                <div class="p-8 flex-1 flex flex-col items-center text-center space-y-4">
+                                    <div class="bg-emerald-500/10 p-4 rounded-2xl text-emerald-500 group-hover:scale-110 transition-transform duration-300">
+                                        <i data-lucide="hand-heart" class="w-8 h-8"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-black text-white text-2xl tracking-tight">Cessão</h3>
+                                        <p class="text-[10px] uppercase font-bold text-emerald-500 tracking-widest mt-1">Ato de Ceder</p>
+                                    </div>
+                                    <div class="w-full h-px bg-white/5"></div>
+                                    <p class="text-sm text-slate-400 leading-relaxed">
+                                        Começa com <strong class="text-emerald-400">C</strong> de <strong class="text-emerald-400">C</strong>eder. É o ato de doar ou transferir posse.
+                                    </p>
+                                    <p class="text-xs text-slate-500 italic bg-black/20 px-3 py-1 rounded-full">"Cessão de direitos"</p>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </article>
+    <hr class="border-border">
+
+                <article id="regencia-fina" class="scroll-mt-32 max-w-5xl mx-auto p-8 bg-[#0f1115] text-slate-100 font-sans rounded-[2rem] shadow-2xl border border-white/10 relative overflow-hidden">
+    
+                    <div class="absolute top-0 right-0 px-6 py-2 bg-blue-600/20 text-blue-400 text-[11px] font-black uppercase tracking-[0.2em] rounded-bl-2xl border-l border-b border-blue-500/20 z-20">
+                        Sintaxe Profunda
+                    </div>
+
+                    <header class="mb-12">
+                        <h2 class="text-5xl font-black text-white mb-4 tracking-tight">13. Regência Fina</h2>
+                        <p class="text-xl text-slate-400 font-medium italic">"A preposição está lá por <span class="text-emerald-400 font-bold">Amor</span> (Regência) ou por <span class="text-amber-400 font-bold">Enfeite</span> (Caracterização)?"</p>
+                        <div class="h-1.5 w-24 bg-blue-600 mt-4 rounded-full opacity-50"></div>
+                    </header>
+
+                    <div class="grid md:grid-cols-2 gap-8 font-sans">
+                        
+                        <div class="bg-slate-900/50 rounded-[2.5rem] border border-white/5 overflow-hidden flex flex-col group hover:border-amber-500/30 transition-all">
+                            <div class="p-8 border-b border-white/5 bg-white/[0.02] flex items-center gap-4">
+                                <div class="bg-amber-500/10 p-3 rounded-xl text-amber-500">
+                                    <i data-lucide="tag" class="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-black text-white text-xl tracking-tight">Caracterização</h3>
+                                    <p class="text-[10px] uppercase font-bold text-amber-500 tracking-widest mt-1">É só uma etiqueta</p>
+                                </div>
+                            </div>
+
+                            <div class="p-8 flex-1 flex flex-col justify-between space-y-6">
+                                <p class="text-sm text-slate-400">A preposição "DE" não é exigida. Ela apenas transforma a palavra em um <strong>Tipo/Adjetivo</strong>.</p>
+                                
+                                <div class="bg-black/40 p-5 rounded-2xl border border-white/5">
+                                    <div class="text-[10px] text-amber-500 font-black uppercase tracking-widest mb-3 flex items-center gap-2">
+                                        <i data-lucide="flask-conical" class="w-3 h-3"></i> Unit Test: Adjetivo
+                                    </div>
+                                    
+                                    <div class="space-y-4 font-mono text-sm">
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-slate-300">Jogo <span class="text-amber-400 font-bold">de boliche</span></span>
+                                            <i data-lucide="arrow-right" class="w-4 h-4 text-slate-600"></i>
+                                            <span class="text-amber-200">Jogo difícil</span>
+                                        </div>
+                                        <div class="h-px w-full bg-white/5"></div>
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-slate-300">Dia <span class="text-amber-400 font-bold">de chuva</span></span>
+                                            <i data-lucide="arrow-right" class="w-4 h-4 text-slate-600"></i>
+                                            <span class="text-amber-200">Dia chuvoso</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start gap-3 p-3 bg-amber-900/10 rounded-xl border border-amber-500/10">
+                                    <i data-lucide="info" class="w-4 h-4 text-amber-500 mt-0.5"></i>
+                                    <p class="text-xs text-amber-200/70 italic">O verbo "Jogar" não pede "de". Quem joga, joga algo.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-900/50 rounded-[2.5rem] border border-white/5 overflow-hidden flex flex-col group hover:border-emerald-500/30 transition-all">
+                            <div class="p-8 border-b border-white/5 bg-white/[0.02] flex items-center gap-4">
+                                <div class="bg-emerald-500/10 p-3 rounded-xl text-emerald-500">
+                                    <i data-lucide="link-2" class="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-black text-white text-xl tracking-tight">Regência Real</h3>
+                                    <p class="text-[10px] uppercase font-bold text-emerald-500 tracking-widest mt-1">Ponte Obrigatória</p>
+                                </div>
+                            </div>
+
+                            <div class="p-8 flex-1 flex flex-col justify-between space-y-6">
+                                <p class="text-sm text-slate-400">A palavra anterior (Verbo ou Nome) <strong>EXIGE</strong> a conexão. Sem a preposição, o sistema cai.</p>
+                                
+                                <div class="space-y-3 font-mono text-sm">
+                                    <div class="bg-emerald-500/5 p-4 rounded-2xl border border-emerald-500/20 flex items-center gap-3">
+                                        <i data-lucide="check-circle-2" class="text-emerald-500 w-5 h-5"></i>
+                                        <div>
+                                            <span class="text-white">Gostar</span> 
+                                            <span class="bg-emerald-500 text-black font-bold px-1.5 py-0.5 rounded text-xs mx-1">DE</span> 
+                                            <span class="text-slate-400">algo</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="bg-emerald-500/5 p-4 rounded-2xl border border-emerald-500/20 flex items-center gap-3">
+                                        <i data-lucide="check-circle-2" class="text-emerald-500 w-5 h-5"></i>
+                                        <div>
+                                            <span class="text-white">Necessidade</span> 
+                                            <span class="bg-emerald-500 text-black font-bold px-1.5 py-0.5 rounded text-xs mx-1">DE</span> 
+                                            <span class="text-slate-400">apoio</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start gap-3 p-3 bg-emerald-900/10 rounded-xl border border-emerald-500/10">
+                                    <i data-lucide="bug" class="w-4 h-4 text-emerald-500 mt-0.5"></i>
+                                    <p class="text-xs text-emerald-200/70 italic">Teste: "Necessidade necessária"? Bug! Não faz sentido. Logo, é Regência.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="mt-8 bg-blue-900/10 border border-blue-500/20 p-8 rounded-[2.5rem] relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-6 opacity-5">
+                            <i data-lucide="zap" class="w-32 h-32 text-blue-400"></i>
+                        </div>
+
+                        <h4 class="text-blue-400 font-black mb-6 flex items-center gap-3 text-lg uppercase tracking-tight">
+                            <i data-lucide="activity" class="w-6 h-6"></i> 
+                            Dica de Mestre: A Lógica da Ação
+                        </h4>
+
+                        <div class="grid md:grid-cols-2 gap-6 relative z-10">
+                            <div class="bg-[#0f1115] p-6 rounded-2xl border border-white/5 flex flex-col">
+                                <div class="flex justify-between mb-2">
+                                    <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Input: Ativo</span>
+                                    <i data-lucide="play-circle" class="w-4 h-4 text-amber-500"></i>
+                                </div>
+                                <p class="text-xl font-bold text-white mb-2">"A crítica <span class="text-amber-400">do diretor</span>."</p>
+                                <div class="h-px w-full bg-white/5 my-2"></div>
+                                <p class="text-xs text-amber-400/80 font-mono">➡ O diretor criticou. (Ele fez)</p>
+                                <p class="text-[10px] text-slate-600 mt-1 uppercase font-bold">Adjunto Adnominal</p>
+                            </div>
+
+                            <div class="bg-[#0f1115] p-6 rounded-2xl border border-white/5 flex flex-col">
+                                <div class="flex justify-between mb-2">
+                                    <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Input: Passivo</span>
+                                    <i data-lucide="stop-circle" class="w-4 h-4 text-emerald-500"></i>
+                                </div>
+                                <p class="text-xl font-bold text-white mb-2">"A crítica <span class="text-emerald-400">ao diretor</span>."</p>
+                                <div class="h-px w-full bg-white/5 my-2"></div>
+                                <p class="text-xs text-emerald-400/80 font-mono">➡ O diretor foi criticado. (Ele sofreu)</p>
+                                <p class="text-[10px] text-slate-600 mt-1 uppercase font-bold">Complemento Nominal</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </article>
+
+                <article id="glossario" class="scroll-mt-32 max-w-5xl mx-auto p-8 bg-[#0f1115] text-slate-100 font-sans rounded-[2rem] shadow-2xl border border-white/10 relative overflow-hidden">
+    
+                    <div class="absolute top-0 right-0 px-6 py-2 bg-blue-600/20 text-blue-400 text-[11px] font-black uppercase tracking-[0.2em] rounded-bl-2xl border-l border-b border-blue-500/20 z-20">
+                        Vocabulário Técnico
+                    </div>
+
+                    <header class="mb-12">
+                        <h2 class="text-5xl font-black text-white mb-4 tracking-tight">14. Glossário & Funções</h2>
+                        <p class="text-xl text-slate-400 font-medium italic">"Decodificando o enunciado: O que a banca realmente quer."</p>
+                        <div class="h-1.5 w-24 bg-blue-600 mt-4 rounded-full opacity-50"></div>
+                    </header>
+
+                    <div class="space-y-12">
+
+                        <div class="bg-slate-900/50 rounded-[2.5rem] border border-white/5 overflow-hidden">
+                            <div class="p-8 border-b border-white/5 bg-white/[0.02] flex items-center gap-4">
+                                <div class="bg-blue-500/10 p-3 rounded-xl text-blue-500">
+                                    <i data-lucide="layers" class="w-6 h-6"></i>
+                                </div>
+                                <h3 class="font-black text-white text-2xl tracking-tight">Semântica Hierárquica</h3>
+                            </div>
+
+                            <div class="p-8 grid md:grid-cols-3 gap-8 items-center text-center">
+                                <div class="group relative">
+                                    <div class="w-24 h-24 mx-auto rounded-full border-2 border-blue-500/30 flex items-center justify-center mb-4 group-hover:border-blue-500 group-hover:bg-blue-500/10 transition-all">
+                                        <i data-lucide="box" class="w-10 h-10 text-blue-400"></i>
+                                    </div>
+                                    <strong class="text-white text-lg block">Hiperônimo</strong>
+                                    <span class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Classe Pai (Genérico)</span>
+                                    <p class="text-sm font-mono text-blue-400 mt-2 bg-blue-500/10 inline-block px-3 py-1 rounded">"Móvel"</p>
+                                </div>
+
+                                <div class="hidden md:flex justify-center text-slate-600">
+                                    <i data-lucide="arrow-right" class="w-8 h-8"></i>
+                                </div>
+
+                                <div class="group relative">
+                                    <div class="w-20 h-20 mx-auto rounded-full border-2 border-emerald-500/30 flex items-center justify-center mb-4 mt-2 group-hover:border-emerald-500 group-hover:bg-emerald-500/10 transition-all">
+                                        <i data-lucide="armchair" class="w-8 h-8 text-emerald-400"></i>
+                                    </div>
+                                    <strong class="text-white text-lg block">Hipônimo</strong>
+                                    <span class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Instância (Específico)</span>
+                                    <p class="text-sm font-mono text-emerald-400 mt-2 bg-emerald-500/10 inline-block px-3 py-1 rounded">"Cadeira"</p>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-black/40 p-4 text-center border-t border-white/5">
+                                <p class="text-sm text-slate-400">
+                                    <strong class="text-white">Polissemia:</strong> Overload de função. Uma palavra, múltiplos significados. 
+                                    <span class="text-xs text-slate-500 block mt-1">(Ex: "Manga" fruta vs. "Manga" camisa)</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-6">
+                            
+                            <div class="bg-slate-900/50 p-6 rounded-3xl border border-white/5 hover:border-amber-500/30 transition-all group">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <span class="bg-amber-500/10 p-2 rounded-lg text-amber-500"><i data-lucide="megaphone" class="w-5 h-5"></i></span>
+                                        <strong class="text-white text-lg">Conativa</strong>
+                                    </div>
+                                    <span class="text-[10px] font-bold text-amber-500 border border-amber-500/20 px-2 py-1 rounded uppercase">Apelativa</span>
+                                </div>
+                                <p class="text-sm text-slate-400 mb-3">Foco no receptor. Ordem, convencimento.</p>
+                                <p class="text-xs text-slate-500 italic">"Compre batom!"</p>
+                            </div>
+
+                            <div class="bg-slate-900/50 p-6 rounded-3xl border border-white/5 hover:border-blue-500/30 transition-all group">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <span class="bg-blue-500/10 p-2 rounded-lg text-blue-500"><i data-lucide="wifi" class="w-5 h-5"></i></span>
+                                        <strong class="text-white text-lg">Fática</strong>
+                                    </div>
+                                    <span class="text-[10px] font-bold text-blue-500 border border-blue-500/20 px-2 py-1 rounded uppercase">Conexão</span>
+                                </div>
+                                <p class="text-sm text-slate-400 mb-3">Testar o canal. Ruído ou contato.</p>
+                                <p class="text-xs text-slate-500 italic">"Alô? Estão me ouvindo?"</p>
+                            </div>
+
+                            <div class="bg-slate-900/50 p-6 rounded-3xl border border-white/5 hover:border-emerald-500/30 transition-all group">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <span class="bg-emerald-500/10 p-2 rounded-lg text-emerald-500"><i data-lucide="newspaper" class="w-5 h-5"></i></span>
+                                        <strong class="text-white text-lg">Referencial</strong>
+                                    </div>
+                                    <span class="text-[10px] font-bold text-emerald-500 border border-emerald-500/20 px-2 py-1 rounded uppercase">Informativa</span>
+                                </div>
+                                <p class="text-sm text-slate-400 mb-3">Foco na informação. Neutro e direto.</p>
+                                <p class="text-xs text-slate-500 italic">Jornalismo, Artigos Científicos.</p>
+                            </div>
+
+                            <div class="bg-slate-900/50 p-6 rounded-3xl border border-white/5 hover:border-rose-500/30 transition-all group">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <span class="bg-rose-500/10 p-2 rounded-lg text-rose-500"><i data-lucide="heart" class="w-5 h-5"></i></span>
+                                        <strong class="text-white text-lg">Emotiva</strong>
+                                    </div>
+                                    <span class="text-[10px] font-bold text-rose-500 border border-rose-500/20 px-2 py-1 rounded uppercase">Expressiva</span>
+                                </div>
+                                <p class="text-sm text-slate-400 mb-3">Foco no emissor (EU). Subjetivo.</p>
+                                <p class="text-xs text-slate-500 italic">Diários, Poemas líricos.</p>
+                            </div>
+
+                            <div class="bg-slate-900/50 p-6 rounded-3xl border border-white/5 hover:border-purple-500/30 transition-all group md:col-span-2">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <span class="bg-purple-500/10 p-2 rounded-lg text-purple-500"><i data-lucide="code" class="w-5 h-5"></i></span>
+                                        <strong class="text-white text-lg">Metalinguagem</strong>
+                                    </div>
+                                    <span class="text-[10px] font-bold text-purple-500 border border-purple-500/20 px-2 py-1 rounded uppercase">Auto-referência</span>
+                                </div>
+                                <p class="text-sm text-slate-400">O código explicando o próprio código. O poema que fala sobre fazer poemas. O dicionário.</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-rose-900/10 border border-rose-500/20 p-8 rounded-[2.5rem] relative overflow-hidden">
+                            <div class="absolute -right-6 -top-6 opacity-5">
+                                <i data-lucide="siren" class="w-32 h-32 text-rose-500"></i>
+                            </div>
+
+                            <h4 class="text-rose-400 font-black mb-8 flex items-center gap-3 text-lg uppercase tracking-tight">
+                                <i data-lucide="bug" class="w-6 h-6"></i> 
+                                Debug de Interpretação
+                            </h4>
+
+                            <div class="space-y-6 relative z-10">
+                                <div class="flex gap-6 items-start">
+                                    <div class="bg-emerald-500/10 p-3 rounded-xl text-emerald-500 shrink-0 border border-emerald-500/20">
+                                        <i data-lucide="search" class="w-6 h-6"></i>
+                                    </div>
+                                    <div>
+                                        <strong class="text-white text-lg block">Inferência (Lógica)</strong>
+                                        <p class="text-sm text-slate-400 mt-1">Deduzir algo que <span class="text-emerald-400 font-bold">não está escrito</span>, mas é matematicamente certo.</p>
+                                        <div class="mt-3 bg-[#0f1115] p-3 rounded-xl border border-white/5 inline-block text-xs font-mono text-slate-300">
+                                            "João parou de fumar." <span class="text-emerald-500">➜</span> Infere-se que ele fumava.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="h-px bg-white/5 w-full"></div>
+
+                                <div class="flex gap-6 items-start">
+                                    <div class="bg-rose-500/10 p-3 rounded-xl text-rose-500 shrink-0 border border-rose-500/20">
+                                        <i data-lucide="alert-octagon" class="w-6 h-6"></i>
+                                    </div>
+                                    <div>
+                                        <strong class="text-white text-lg block">Extrapolação (Erro)</strong>
+                                        <p class="text-sm text-slate-400 mt-1">Sair do texto. Adicionar dados externos não confirmados.</p>
+                                        <div class="mt-3 bg-[#0f1115] p-3 rounded-xl border border-white/5 inline-block text-xs font-mono text-slate-300">
+                                            "João parou de fumar." <span class="text-rose-500">➜</span> Extrapolação: Ele teve câncer.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </article>
+            </div>  </main>
+    </div> <script>
         lucide.createIcons();
     </script>
+    
 </body>
 </html>
