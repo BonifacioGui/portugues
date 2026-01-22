@@ -428,6 +428,14 @@
                         <li><a href="#ambiguidade" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="split" class="w-4 h-4 text-orange-400"></i> 17. Ambiguidade</a></li>
                     </ul>
                 </div>
+                <div>
+                    <h3 class="text-xs font-bold text-muted uppercase tracking-widest mb-3 px-2">Parte 5: Refinamento (Elite)</h3>
+                    <ul class="space-y-1">
+                        <li><a href="#adjetivos-relacao" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="tag" class="w-4 h-4 text-indigo-400"></i> 18. Adj. de Relação</a></li>
+                        <li><a href="#referenciacao" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="corner-down-right" class="w-4 h-4 text-cyan-400"></i> 19. Este vs. Esse</a></li>
+                        <li><a href="#nominalizacao" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="settings-2" class="w-4 h-4 text-emerald-400"></i> 20. Nominalização</a></li>
+                    </ul>
+                </div>
             </nav>
         </aside>
 
@@ -2521,6 +2529,169 @@
                                         "Vende-se berço <strong class="text-success">de madeira</strong> para criança."
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </article>
+
+                <hr class="border-border">
+
+                <article id="adjetivos-relacao" class="scroll-mt-24">
+                    <header class="mb-8 mt-12">
+                        <h2 class="font-sans text-3xl font-extrabold text-white mb-2">18. Adjetivos de Relação</h2>
+                        <p class="text-muted">A diferença entre "Qualificar" (Opinião) e "Classificar" (Fato).</p>
+                    </header>
+
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="bg-indigo-900/10 border border-indigo-500/20 p-6 rounded-2xl">
+                            <h3 class="text-indigo-400 font-bold text-lg mb-4 flex items-center gap-2"><i data-lucide="fingerprint"></i> O Classificador</h3>
+                            <p class="text-sm text-gray-300 mb-4">Adjetivos de relação <strong>não dão opinião</strong>. Eles dizem o "tipo", a "origem" ou a "natureza".</p>
+                            
+                            <ul class="space-y-3 text-sm">
+                                <li class="flex gap-3 bg-black/30 p-3 rounded border border-indigo-500/10">
+                                    <span class="text-indigo-400 font-bold">1. Não varia em grau</span>
+                                    <span class="text-gray-400">Não existe "vinho muito chileno". Ou é, ou não é.</span>
+                                </li>
+                                <li class="flex gap-3 bg-black/30 p-3 rounded border border-indigo-500/10">
+                                    <span class="text-indigo-400 font-bold">2. Posição fixa</span>
+                                    <span class="text-gray-400">Vem sempre DEPOIS do nome. (Vinho chileno ✅ / Chileno vinho ❌).</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="bg-paper p-4 rounded-xl border-l-4 border-gray-500">
+                                <p class="text-xs text-gray-500 uppercase font-bold tracking-widest mb-1">Adjetivo Explicativo (Opinião)</p>
+                                <p class="text-lg text-white">"Um funcionário <strong class="text-gray-400">competente</strong>."</p>
+                                <p class="text-xs text-gray-500 mt-1">Eu acho ele competente. Você pode não achar. Aceita "muito".</p>
+                            </div>
+
+                            <div class="bg-paper p-4 rounded-xl border-l-4 border-indigo-500">
+                                <p class="text-xs text-indigo-500 uppercase font-bold tracking-widest mb-1">Adjetivo de Relação (Fato)</p>
+                                <p class="text-lg text-white">"Um funcionário <strong class="text-indigo-400">estatutário</strong>."</p>
+                                <p class="text-xs text-gray-500 mt-1">É o tipo dele. Não existe "muito estatutário". É objetivo.</p>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <hr class="border-border">
+
+                <article id="referenciacao" class="scroll-mt-24">
+                    <header class="mb-8 mt-12">
+                        <h2 class="font-sans text-3xl font-extrabold text-white mb-2">19. Este vs. Esse</h2>
+                        <p class="text-muted">A bússola do texto. Para onde o pronome aponta?</p>
+                    </header>
+                    
+
+                    <div class="grid md:grid-cols-2 gap-6 font-mono text-sm">
+                        
+                        <div class="bg-[#0f1115] p-6 rounded-2xl border border-cyan-500/20 hover:border-cyan-500/50 transition relative overflow-hidden group">
+                            <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition">
+                                <i data-lucide="arrow-down" class="w-24 h-24 text-cyan-500"></i>
+                            </div>
+                            <h3 class="text-cyan-400 font-black text-2xl mb-2">ESTE / ISTO</h3>
+                            <span class="bg-cyan-500/10 text-cyan-400 px-2 py-1 rounded text-xs font-bold uppercase">Catáfora (Vai falar)</span>
+                            
+                            <div class="mt-6 space-y-4 relative z-10">
+                                <p class="text-gray-300">Aponta para o <strong class="text-white">FUTURO</strong> do texto.</p>
+                                <div class="bg-black/50 p-3 rounded border border-cyan-500/10">
+                                    "Meu lema é <strong class="text-cyan-400 underline">este</strong>: nunca desistir."
+                                </div>
+                                <p class="text-gray-300 mt-2">Aponta para o <strong class="text-white">PRESENTE</strong> (Tempo).</p>
+                                <div class="bg-black/50 p-3 rounded border border-cyan-500/10">
+                                    "<strong class="text-cyan-400 underline">Neste</strong> ano (2026)..."
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-[#0f1115] p-6 rounded-2xl border border-purple-500/20 hover:border-purple-500/50 transition relative overflow-hidden group">
+                            <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition">
+                                <i data-lucide="arrow-up" class="w-24 h-24 text-purple-500"></i>
+                            </div>
+                            <h3 class="text-purple-400 font-black text-2xl mb-2">ESSE / ISSO</h3>
+                            <span class="bg-purple-500/10 text-purple-400 px-2 py-1 rounded text-xs font-bold uppercase">Anáfora (Já falou)</span>
+                            
+                            <div class="mt-6 space-y-4 relative z-10">
+                                <p class="text-gray-300">Aponta para o <strong class="text-white">PASSADO</strong> do texto.</p>
+                                <div class="bg-black/50 p-3 rounded border border-purple-500/10">
+                                    "Estudar muito. <strong class="text-purple-400 underline">Isso</strong> é essencial."
+                                </div>
+                                <p class="text-gray-300 mt-2">Aponta para o <strong class="text-white">PASSADO</strong> (Tempo).</p>
+                                <div class="bg-black/50 p-3 rounded border border-purple-500/10">
+                                    "<strong class="text-purple-400 underline">Nesse</strong> ano (2025)..."
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </article>
+
+                <hr class="border-border">
+
+                <article id="nominalizacao" class="scroll-mt-24">
+                    <header class="mb-8 mt-12">
+                        <h2 class="font-sans text-3xl font-extrabold text-white mb-2">20. Nominalização</h2>
+                        <p class="text-muted">O segredo da FGV: transformar "Ação" em "Coisa".</p>
+                    </header>
+
+                    <div class="space-y-8">
+                        
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="bg-[#1a1515] p-6 rounded-2xl border-l-4 border-rose-500 relative overflow-hidden">
+                                <div class="absolute top-0 right-0 p-4 opacity-10"><i data-lucide="zap" class="w-16 h-16 text-rose-500"></i></div>
+                                <h3 class="text-rose-400 font-bold mb-4 flex items-center gap-2 uppercase tracking-widest text-xs">
+                                    <i data-lucide="play" class="w-4 h-4"></i> Estilo Verbal (Ação)
+                                </h3>
+                                <p class="text-xl text-white font-mono mb-2">"O diretor <span class="text-rose-500 font-black bg-rose-500/10 px-1 rounded">analisou</span> o projeto."</p>
+                                <p class="text-xs text-slate-500">Foco em quem faz e na ação.</p>
+                            </div>
+
+                            <div class="bg-[#0f1c15] p-6 rounded-2xl border-l-4 border-emerald-500 relative overflow-hidden">
+                                <div class="absolute top-0 right-0 p-4 opacity-10"><i data-lucide="package" class="w-16 h-16 text-emerald-500"></i></div>
+                                <h3 class="text-emerald-400 font-bold mb-4 flex items-center gap-2 uppercase tracking-widest text-xs">
+                                    <i data-lucide="box" class="w-4 h-4"></i> Estilo Nominal (Coisa)
+                                </h3>
+                                <p class="text-xl text-white font-mono mb-2">"A <span class="text-emerald-500 font-black bg-emerald-500/10 px-1 rounded">análise</span> do projeto..."</p>
+                                <p class="text-xs text-slate-500">Foco no resultado (o substantivo).</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-900/50 border border-white/10 p-8 rounded-[2rem]">
+                            <h4 class="text-center text-white font-bold mb-8 flex items-center justify-center gap-2">
+                                <i data-lucide="flask-conical" class="w-5 h-5 text-blue-400"></i> A Fórmula da Transformação
+                            </h4>
+
+                            <div class="flex flex-col md:flex-row items-center justify-center gap-4 text-sm font-mono">
+                                
+                                <div class="flex flex-col items-center gap-2">
+                                    <span class="text-rose-400 font-bold">VERBO</span>
+                                    <span class="bg-rose-500/10 text-rose-200 px-3 py-1 rounded border border-rose-500/20">Construir</span>
+                                </div>
+
+                                <i data-lucide="arrow-right" class="w-6 h-6 text-slate-500 hidden md:block"></i>
+                                <i data-lucide="arrow-down" class="w-6 h-6 text-slate-500 md:hidden"></i>
+
+                                <div class="flex flex-col items-center gap-2">
+                                    <span class="text-emerald-400 font-bold">SUBSTANTIVO</span>
+                                    <span class="bg-emerald-500/10 text-emerald-200 px-3 py-1 rounded border border-emerald-500/20">A construção</span>
+                                </div>
+
+                                <div class="w-px h-12 bg-white/10 mx-4 hidden md:block"></div>
+                                <div class="h-px w-full bg-white/10 my-4 md:hidden"></div>
+
+                                <div class="flex flex-col items-center gap-2">
+                                    <span class="text-amber-400 font-bold">+ PREPOSIÇÃO</span>
+                                    <span class="bg-amber-500/10 text-amber-200 px-3 py-1 rounded border border-amber-500/20">DE / DO / DA</span>
+                                </div>
+                            </div>
+
+                            <div class="mt-8 text-center">
+                                <p class="text-slate-400 text-sm">
+                                    Sempre que você mata o verbo, nasce uma preposição. <br>
+                                    <span class="italic text-slate-500">"Construir pontes" ➜ "Construção <strong class="text-white">DE</strong> pontes".</span>
+                                </p>
                             </div>
                         </div>
 
