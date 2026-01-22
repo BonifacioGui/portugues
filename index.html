@@ -134,7 +134,59 @@
                 { q: "A palavra 'Item' leva acento por ser paroxítona.", a: false, expl: "Negativo. Paroxítonas terminadas em EM/ENS não levam acento.", category: "Acentuação" },
                 { q: "Na frase 'Falta cinco dias', a concordância está correta.", a: false, expl: "Bug de Concordância. O sujeito é 'cinco dias' (plural), logo: 'Faltam'.", category: "Sintaxe" },
                 { q: "O hífen é usado em 'Micro-ondas' porque letras iguais se repelem.", a: true, expl: "Física da Ortografia correta. Vogais iguais exigem separação.", category: "Hífen" },
-                { q: "O pronome 'QUE' pode ser substituído por 'O QUAL' quando é Relativo.", a: true, expl: "Ponteiro verificado. Ele retoma o termo anterior.", category: "Pronomes" }
+                { q: "O pronome 'QUE' pode ser substituído por 'O QUAL' quando é Relativo.", a: true, expl: "Ponteiro verificado. Ele retoma o termo anterior.", category: "Pronomes" },
+                // === CRASE & REGÊNCIA (O Calcanhar de Aquiles) ===
+                { q: "Na frase 'Fui à Bahia', a crase ocorre porque 'Volto da Bahia'.", a: true, expl: "Check de Origem validado. 'Vou a, volto da, crase há'.", category: "Crase" },
+                { q: "A expressão 'bife a cavalo' deve ter crase.", a: false, expl: "Erro de Tipo. 'Cavalo' é masculino (M.V.P). Apenas 'Moda de' aceita crase implícita.", category: "Crase" },
+                { q: "Em 'Refiro-me a ela', a crase é proibida.", a: true, expl: "Bloqueio de Pronome. Não se usa crase antes de pronome pessoal.", category: "Crase" },
+                { q: "O verbo 'Namorar' exige a preposição 'com'.", a: false, expl: "Erro de Dependência. Namorar é VTD (transitivo direto). Quem namora, namora alguém.", category: "Regência" },
+                { q: "O verbo 'Obedecer' exige a preposição 'a'.", a: true, expl: "Dependência Obrigatória. Quem obedece, obedece A algo/alguém.", category: "Regência" },
+                { q: "A expressão 'À medida que' sempre leva crase.", a: true, expl: "Constante do Sistema. Locuções femininas de proporção sempre têm crase.", category: "Crase" },
+                { q: "Em 'Diga a Vossa Senhoria', ocorre crase.", a: false, expl: "Acesso Negado. Pronomes de tratamento (exceto Senhora/Dona) repelem crase.", category: "Crase" },
+
+                // === CONCORDÂNCIA (Os Bugs Lógicos) ===
+                { q: "Na frase 'Fazem dois anos que não te vejo', o verbo está correto.", a: false, expl: "Bug no Verbo. Fazer (tempo) é impessoal e trava no singular. Correto: 'Faz'.", category: "Concordância" },
+                { q: "O verbo 'Haver' no sentido de existir vai para o plural.", a: false, expl: "Erro de Instância. Haver (existir) é 'singleton': só existe no singular.", category: "Concordância" },
+                { q: "Em 'Seguem anexas as planilhas', a concordância está correta.", a: true, expl: "Compilação OK. 'Anexo' é adjetivo e concorda com o nome (planilhas).", category: "Concordância" },
+                { q: "A expressão 'É proibido entrada' está correta (sem artigo).", a: true, expl: "Regra Genérica. Sem determinante ('a'), o adjetivo fica no masculino singular.", category: "Concordância" },
+                { q: "Ela estava 'meia' nervosa durante a prova.", a: false, expl: "Erro de Tipo. Advérbio 'meio' (um pouco) é imutável. Não existe 'metade mulher'.", category: "Concordância" },
+                { q: "Mais de um aluno 'faltou' à aula.", a: true, expl: "Lógica Numérica. 'Mais de um' concorda com o numeral (1 = singular), a menos que seja recíproco.", category: "Concordância" },
+
+                // === HÍFEN & ORTOGRAFIA (Física das Letras) ===
+                { q: "A palavra 'Autoescola' não tem hífen.", a: true, expl: "Atração de Opostos. Vogais diferentes (o + e) se unem.", category: "Hífen" },
+                { q: "A palavra 'Anti-inflamatório' leva hífen.", a: true, expl: "Repulsão de Iguais. Vogal igual (i + i) exige separação.", category: "Hífen" },
+                { q: "A palavra 'Superhomem' está grafada corretamente.", a: false, expl: "Colisão com H. O 'H' é uma parede (muro), sempre exige hífen.", category: "Hífen" },
+                { q: "A palavra 'Paralização' escreve-se com Z.", a: false, expl: "Erro de Herança. Vem de 'Paralisia' (S). A filha herda o DNA da mãe.", category: "Ortografia" },
+                { q: "O verbo 'Pôr' leva acento diferencial.", a: true, expl: "Destaque Visual. O acento diferencia o verbo da preposição 'por'.", category: "Acentuação" },
+                { q: "A palavra 'Ideia' perdeu o acento no Novo Acordo.", a: true, expl: "Atualização de Software. Ditongos abertos (ei, oi) em paroxítonas perderam o acento.", category: "Acentuação" },
+
+                // === CONECTIVOS & TEXTO (O Código Fonte) ===
+                { q: "O conectivo 'Conquanto' tem valor de Causa.", a: false, expl: "Erro de Mapeamento. 'Conquanto' = Embora (Concessiva/Teimosia).", category: "Conectivos" },
+                { q: "O conectivo 'Portanto' indica Conclusão.", a: true, expl: "Fluxo Finalizado. Encerra o raciocínio lógico.", category: "Conectivos" },
+                { q: "Um texto Injuntivo tem a função de contar uma história.", a: false, expl: "Erro de Função. Injuntivo dá ordens (manual/receita). Narrativo conta história.", category: "Tipos Textuais" },
+                { q: "A função Fática é centrada no canal de comunicação.", a: true, expl: "Ping no Servidor. Serve para testar se a conexão está ativa ('Alô?').", category: "Funções da Linguagem" },
+                { q: "Inferência é deduzir algo que não está escrito, mas é lógico.", a: true, expl: "Processamento Lógico. Diferente de extrapolação (que é inventar dados).", category: "Interpretação" },
+
+                // === SE & QUE (As Variáveis Mágicas) ===
+                { q: "Em 'Vende-se casas', o verbo deveria estar no singular.", a: false, expl: "Erro de Ponteiro. É P.A. (Partícula Apassivadora). O sujeito é 'casas', logo o verbo pluraliza.", category: "Sintaxe" },
+                { q: "Em 'Precisa-se de pedreiros', o sujeito é indeterminado.", a: true, expl: "Bloqueio por Preposição. Tem preposição? O 'SE' trava o verbo no singular.", category: "Sintaxe" },
+                { q: "O 'QUE' é Conjunção Integrante quando pode ser trocado por 'ISSO'.", a: true, expl: "Teste de Substituição. Trocou por ISSO? É Conjunção.", category: "Sintaxe" },
+                { q: "O 'QUE' é Pronome Relativo quando retoma um termo anterior.", a: true, expl: "Ponteiro de Memória. Ele aponta para o substantivo que veio antes.", category: "Sintaxe" },
+
+                // === PONTUAÇÃO & SEMÂNTICA (O Compilador) ===
+                { q: "A vírgula é obrigatória para separar o sujeito do predicado.", a: false, expl: "Fatal Error. Jamais separe Sujeito e Verbo (S.V.C).", category: "Pontuação" },
+                { q: "A 'Vírgula Vicária' serve para substituir um verbo repetido.", a: true, expl: "Otimização de Código. Evita repetição (Zeugma).", category: "Pontuação" },
+                { q: "Hiperônimo é a palavra de sentido mais específico.", a: false, expl: "Erro de Hierarquia. Hiperônimo é a classe Geral (Móvel). Hipônimo é o específico (Cadeira).", category: "Semântica" },
+                { q: "A frase 'Ele parou de beber' permite inferir que ele bebia.", a: true, expl: "Lógica Booleana. Para parar, o estado anterior devia ser 'true'.", category: "Interpretação" },
+                { q: "Polissemia é quando uma palavra tem apenas um sentido.", a: false, expl: "Erro de Definição. 'Poli' = Muitos. Uma chave serve para abrir porta e para consertar carro.", category: "Semântica" },
+
+                // === PORQUÊS (Debug Final) ===
+                { q: "Usa-se 'Por que' (separado) no início de perguntas.", a: true, expl: "Início de Query. Separado para perguntar.", category: "Ortografia" },
+                { q: "Usa-se 'Por quê' (com acento) quando está isolado no final.", a: true, expl: "Barreira de Pontuação. O ponto final exige o acento.", category: "Ortografia" },
+                { q: "Usa-se 'O porquê' (junto e com acento) como substantivo.", a: true, expl: "Objeto Instanciado. O artigo 'O' transforma em substantivo.", category: "Ortografia" },
+                { q: "Usa-se 'Porque' (junto) para perguntas.", a: false, expl: "Erro de Função. Junto é para RESPOSTA ou CAUSA.", category: "Ortografia" },
+                { q: "Em 'A casa onde moro', o uso de 'onde' está correto.", a: true, expl: "Local Estático. Verbo morar pede 'onde' (fixo).", category: "Gramática" },
+                { q: "Em 'Aonde você vai?', o uso de 'aonde' está correto.", a: true, expl: "Destino Dinâmico. Verbo ir pede movimento (A + Onde).", category: "Gramática" }
             ],
 
             init() {
@@ -2170,97 +2222,276 @@
                 <hr class="border-border">
 
                 <article id="interpretacao" class="scroll-mt-24">
-                    <header class="mb-6">
-                        <span class="font-sans text-xs font-bold text-primary tracking-widest uppercase mb-2 block">Assunto Nº 1 da Prova</span>
-                        <h2 class="font-sans text-3xl font-extrabold text-white mb-2">15. Interpretação Cirúrgica</h2>
+                    <header class="mb-8 border-b border-border pb-6 flex justify-between items-end">
+                        <div>
+                            <span class="bg-primary/20 text-primary border border-primary/50 text-xs font-bold px-2 py-1 rounded mb-2 inline-block">ASSUNTO Nº 1 DA PROVA</span>
+                            <h2 class="font-sans text-4xl font-extrabold text-white mb-2">15. Interpretação Cirúrgica</h2>
+                            <p class="text-muted">Como não cair nas armadilhas do examinador.</p>
+                        </div>
                     </header>
 
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div class="bg-paper p-6 rounded-xl border border-border">
-                            <h3 class="font-bold text-white mb-4 font-sans flex items-center gap-2"><i data-lucide="target" class="text-primary"></i> O Método de Ataque</h3>
-                            <ul class="space-y-4 text-sm text-gray-300">
-                                <li class="bg-black/20 p-3 rounded border border-border/50">
-                                    <strong class="text-white block mb-1">1. Comando Primeiro</strong>
-                                    Leia a pergunta ANTES do texto. A FGV cansa você. Vá direto ao que ela quer (ideia central? um detalhe? tom do autor?).
-                                </li>
-                                <li class="bg-black/20 p-3 rounded border border-border/50">
-                                    <strong class="text-white block mb-1">2. O "Título" Escondido</strong>
-                                    O primeiro parágrafo (Tópico Frasal) geralmente contém a <strong>Tese</strong>. O resto é enrolação/exemplo.
-                                </li>
-                            </ul>
-                        </div>
+                    <div class="mb-8 bg-paper p-6 rounded-xl border border-border">
+                        <h3 class="font-bold text-white mb-6 font-sans flex items-center gap-2">
+                            <i data-lucide="crosshair" class="w-5 h-5 text-primary"></i> O Protocolo de Ataque
+                        </h3>
+                        
+                        <div class="grid md:grid-cols-3 gap-4 text-center relative">
+                            <div class="hidden md:block absolute top-1/2 left-0 w-full h-1 bg-white/5 -z-0"></div>
 
-                        <div class="bg-paper p-6 rounded-xl border border-border">
-                            <h3 class="font-bold text-white mb-4 font-sans flex items-center gap-2"><i data-lucide="alert-octagon" class="text-danger"></i> Os 3 Erros FGV</h3>
-                            <div class="space-y-3 text-sm">
-                                <div class="flex gap-3">
-                                    <span class="text-danger font-bold">Extrapolação</span>
-                                    <span class="text-muted">Viajar na maionese. Dizer o que o texto não disse.</span>
-                                </div>
-                                <div class="flex gap-3">
-                                    <span class="text-warning font-bold">Redução</span>
-                                    <span class="text-muted">Focar num detalhe (exemplo) e dizer que é a ideia principal.</span>
-                                </div>
-                                <div class="flex gap-3">
-                                    <span class="text-success font-bold">Contradição</span>
-                                    <span class="text-muted">Concluir o oposto do autor. (Cuidado com a ironia!).</span>
-                                </div>
+                            <div class="relative z-10 bg-[#1e1e1e] p-4 rounded-lg border border-white/10 hover:border-primary transition-colors">
+                                <div class="w-8 h-8 bg-primary text-white font-bold rounded-full flex items-center justify-center mx-auto mb-3 shadow-[0_0_10px_rgba(59,130,246,0.5)]">1</div>
+                                <strong class="text-white block mb-1">Comando Primeiro</strong>
+                                <p class="text-xs text-gray-400">Leia a pergunta ANTES do texto. Saiba o que caçar (ideia central? tom? detalhe?).</p>
+                            </div>
+
+                            <div class="relative z-10 bg-[#1e1e1e] p-4 rounded-lg border border-white/10 hover:border-primary transition-colors">
+                                <div class="w-8 h-8 bg-primary text-white font-bold rounded-full flex items-center justify-center mx-auto mb-3 shadow-[0_0_10px_rgba(59,130,246,0.5)]">2</div>
+                                <strong class="text-white block mb-1">Caça à Tese</strong>
+                                <p class="text-xs text-gray-400">O 1º parágrafo manda. O resto é exemplo. Ache a opinião do autor.</p>
+                            </div>
+
+                            <div class="relative z-10 bg-[#1e1e1e] p-4 rounded-lg border border-white/10 hover:border-primary transition-colors">
+                                <div class="w-8 h-8 bg-primary text-white font-bold rounded-full flex items-center justify-center mx-auto mb-3 shadow-[0_0_10px_rgba(59,130,246,0.5)]">3</div>
+                                <strong class="text-white block mb-1">Eliminação</strong>
+                                <p class="text-xs text-gray-400">Não procure a certa. Elimine as 3 erradas clássicas (veja abaixo).</p>
                             </div>
                         </div>
                     </div>
+
+                    <div class="grid md:grid-cols-3 gap-4 mb-8">
+                        
+                        <div class="bg-paper p-5 rounded-xl border-t-4 border-danger hover:bg-white/5 transition group">
+                            <div class="flex justify-between items-start mb-3">
+                                <strong class="text-danger text-lg">Extrapolação</strong>
+                                <i data-lucide="maximize" class="w-5 h-5 text-danger group-hover:scale-125 transition-transform"></i>
+                            </div>
+                            <p class="text-sm text-gray-300 mb-2">Viajou na maionese.</p>
+                            <div class="text-xs bg-black/30 p-2 rounded text-gray-400">
+                                O texto diz "A". A questão diz "A e B". <br>
+                                <span class="text-danger font-bold">Erro:</span> Saiu do texto.
+                            </div>
+                        </div>
+
+                        <div class="bg-paper p-5 rounded-xl border-t-4 border-warning hover:bg-white/5 transition group">
+                            <div class="flex justify-between items-start mb-3">
+                                <strong class="text-warning text-lg">Redução</strong>
+                                <i data-lucide="minimize" class="w-5 h-5 text-warning group-hover:scale-125 transition-transform"></i>
+                            </div>
+                            <p class="text-sm text-gray-300 mb-2">Olhou só pro umbigo.</p>
+                            <div class="text-xs bg-black/30 p-2 rounded text-gray-400">
+                                O texto fala da "Floresta". A questão foca na "Árvore". <br>
+                                <span class="text-warning font-bold">Erro:</span> Focou no exemplo.
+                            </div>
+                        </div>
+
+                        <div class="bg-paper p-5 rounded-xl border-t-4 border-purple-500 hover:bg-white/5 transition group">
+                            <div class="flex justify-between items-start mb-3">
+                                <strong class="text-purple-400 text-lg">Contradição</strong>
+                                <i data-lucide="refresh-ccw" class="w-5 h-5 text-purple-400 group-hover:scale-125 transition-transform"></i>
+                            </div>
+                            <p class="text-sm text-gray-300 mb-2">Entendeu tudo errado.</p>
+                            <div class="text-xs bg-black/30 p-2 rounded text-gray-400">
+                                O autor foi irônico e você levou a sério. <br>
+                                <span class="text-purple-400 font-bold">Erro:</span> Oposto da verdade.
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="bg-success/10 border border-success/30 p-5 rounded-xl flex items-start gap-4">
+                        <div class="bg-success/20 p-3 rounded-full text-success shrink-0">
+                            <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-success font-bold text-lg mb-1">O Segredo da Resposta Certa</h4>
+                            <p class="text-sm text-gray-300">
+                                A FGV ama a <strong>Paráfrase</strong>. A resposta correta quase nunca repete as palavras do texto. 
+                                Ela diz a <strong>mesma coisa</strong> com <strong>outras palavras</strong> (sinônimos).
+                            </p>
+                            <p class="text-xs text-gray-500 mt-2 italic">Se está escrito igualzinho ao texto, desconfie. Pode ser pegadinha.</p>
+                        </div>
+                    </div>
+
                 </article>
 
                 <hr class="border-border">
 
                 <article id="subjetividade" class="scroll-mt-24">
-                    <h2 class="font-sans text-3xl font-extrabold text-white mb-6">16. Opinião vs. Fato</h2>
-                    <p class="text-muted mb-6">A FGV pede: "Qual frase mostra a visão do autor?". O segredo está nos adjetivos e advérbios.</p>
+                    <header class="mb-8 border-b border-border pb-6 flex justify-between items-end">
+                        <div>
+                            <h2 class="font-sans text-4xl font-extrabold text-white mb-2">16. Opinião vs. Fato</h2>
+                            <p class="text-muted">A caça aos adjetivos valorativos.</p>
+                        </div>
+                    </header>
 
-                    <div class="grid md:grid-cols-2 gap-6 font-sans">
-                        <div class="bg-paper p-6 rounded-xl border-l-4 border-primary">
-                            <h3 class="text-xl font-bold text-white mb-2">📸 Fato (Objetivo)</h3>
-                            <p class="text-xs text-muted mb-4 uppercase tracking-widest">Linguagem Denotativa</p>
-                            <p class="text-white text-lg">"O prédio é <span class="text-primary font-bold">alto</span>."</p>
-                            <p class="text-gray-400 text-sm mt-2">É mensurável. Ninguém discorda.</p>
+                    <div class="grid md:grid-cols-2 gap-6 font-sans mb-8">
+                        
+                        <div class="bg-paper p-0 rounded-xl border-t-4 border-cyan-400 overflow-hidden flex flex-col hover:bg-white/5 transition">
+                            <div class="p-6 pb-2">
+                                <div class="flex justify-between items-start mb-4">
+                                    <h3 class="text-xl font-bold text-cyan-400 flex items-center gap-2">
+                                        <i data-lucide="camera" class="w-6 h-6"></i> Fato (Objetivo)
+                                    </h3>
+                                    <span class="text-[10px] uppercase font-bold text-cyan-400 bg-cyan-400/10 px-2 py-1 rounded">Incontestável</span>
+                                </div>
+                                <p class="text-sm text-gray-300">É o que a câmera registra. Dados, números, medidas. Não depende de quem fala.</p>
+                            </div>
+                            
+                            <div class="p-6 pt-0 mt-auto">
+                                <div class="bg-black/30 p-4 rounded-lg border border-cyan-400/20 text-center">
+                                    <p class="text-gray-400 text-xs uppercase tracking-widest mb-1">Exemplo</p>
+                                    <p class="text-white text-lg">"O prédio tem <span class="text-cyan-400 font-bold">20 andares</span>."</p>
+                                </div>
+                                <p class="text-xs text-center text-gray-500 mt-2">Ninguém pode discordar. É contável.</p>
+                            </div>
                         </div>
 
-                        <div class="bg-paper p-6 rounded-xl border-l-4 border-pink-500">
-                            <h3 class="text-xl font-bold text-white mb-2">🧠 Opinião (Subjetivo)</h3>
-                            <p class="text-xs text-muted mb-4 uppercase tracking-widest">Linguagem Conotativa/Valorativa</p>
-                            <p class="text-white text-lg">"O prédio é <span class="text-pink-500 font-bold">imponente</span>."</p>
-                            <p class="text-gray-400 text-sm mt-2">Juízo de valor. "Imponente" é opinião do autor.</p>
+                        <div class="bg-paper p-0 rounded-xl border-t-4 border-pink-500 overflow-hidden flex flex-col hover:bg-white/5 transition">
+                            <div class="p-6 pb-2">
+                                <div class="flex justify-between items-start mb-4">
+                                    <h3 class="text-xl font-bold text-pink-500 flex items-center gap-2">
+                                        <i data-lucide="glasses" class="w-6 h-6"></i> Opinião (Subjetivo)
+                                    </h3>
+                                    <span class="text-[10px] uppercase font-bold text-pink-500 bg-pink-500/10 px-2 py-1 rounded">Juízo de Valor</span>
+                                </div>
+                                <p class="text-sm text-gray-300">É o filtro do autor. Adjetivos que qualificam (elogiam ou criticam).</p>
+                            </div>
+                            
+                            <div class="p-6 pt-0 mt-auto">
+                                <div class="bg-black/30 p-4 rounded-lg border border-pink-500/20 text-center">
+                                    <p class="text-gray-400 text-xs uppercase tracking-widest mb-1">Exemplo</p>
+                                    <p class="text-white text-lg">"O prédio é <span class="text-pink-500 font-bold">imponente</span>."</p>
+                                </div>
+                                <p class="text-xs text-center text-gray-500 mt-2">Você pode achar feio. É discutível.</p>
+                            </div>
                         </div>
+
                     </div>
-                    
-                    <div class="mt-6 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-sm text-yellow-200">
-                        <strong>💡 Dica Ninja:</strong> Procure por advérbios de modo ("Infelizmente", "Brilhantemente") ou adjetivos que não são físicos ("Absurdo", "Magnífico"). Eles entregam a opinião.
+
+                    <div class="bg-paper border border-yellow-500/30 p-6 rounded-xl relative overflow-hidden">
+                        <div class="absolute -right-6 -top-6 opacity-5">
+                            <i data-lucide="scan-search" class="w-32 h-32 text-yellow-500"></i>
+                        </div>
+
+                        <h3 class="font-bold text-yellow-500 mb-4 font-sans flex items-center gap-2">
+                            <i data-lucide="siren" class="w-5 h-5"></i> O Detector de Opinião
+                        </h3>
+                        <p class="text-sm text-gray-400 mb-4 relative z-10">Se a frase tiver uma dessas classes, marque como <strong>Visão do Autor</strong>:</p>
+
+                        <div class="grid md:grid-cols-3 gap-4 relative z-10 text-sm">
+                            <div class="bg-black/40 p-3 rounded-lg border-l-2 border-yellow-500">
+                                <strong class="text-white block mb-1">1. Adjetivos Abstratos</strong>
+                                <p class="text-gray-400 text-xs">Bonito, Feio, Absurdo, Incrível, Lamentável.</p>
+                            </div>
+                            
+                            <div class="bg-black/40 p-3 rounded-lg border-l-2 border-yellow-500">
+                                <strong class="text-white block mb-1">2. Advérbios de Modo</strong>
+                                <p class="text-gray-400 text-xs">Infelizmente, Brilhantemente, Felizmente.</p>
+                            </div>
+
+                            <div class="bg-black/40 p-3 rounded-lg border-l-2 border-yellow-500">
+                                <strong class="text-white block mb-1">3. Verbos de Sentimento</strong>
+                                <p class="text-gray-400 text-xs">Acredito, Penso, Sinto, Temo.</p>
+                            </div>
+                        </div>
                     </div>
                 </article>
 
                 <hr class="border-border">
 
                 <article id="ambiguidade" class="scroll-mt-24">
-                    <h2 class="font-sans text-3xl font-extrabold text-white mb-6">17. Ambiguidade (Duplo Sentido)</h2>
-                    <div class="bg-paper p-6 rounded-xl border border-border">
-                        <div class="grid gap-4">
-                            <div class="flex flex-col md:flex-row gap-4 items-center bg-black/30 p-4 rounded-lg">
-                                <div class="text-danger font-bold text-lg min-w-[80px] text-center">O ERRO</div>
-                                <div class="flex-1">
-                                    <p class="text-white italic">"O policial prendeu o ladrão em <strong class="text-danger">sua</strong> casa."</p>
-                                    <p class="text-muted text-xs mt-1">Casa de quem? Do policial ou do ladrão?</p>
-                                </div>
+                    <header class="mb-8 border-b border-border pb-6 flex justify-between items-end">
+                        <div>
+                            <h2 class="font-sans text-4xl font-extrabold text-white mb-2">17. Ambiguidade (Duplo Sentido)</h2>
+                            <p class="text-muted">Quando a frase conta duas histórias diferentes.</p>
+                        </div>
+                    </header>
+
+                    <div class="space-y-8">
+                        
+                        <div class="bg-paper p-0 rounded-xl border border-border overflow-hidden">
+                            <div class="p-4 bg-white/5 border-b border-white/5 flex items-center justify-between">
+                                <h3 class="font-bold text-white flex items-center gap-2">
+                                    <span class="bg-danger/20 text-danger px-2 py-1 rounded text-xs font-bold">TIPO 1</span>
+                                    Ambiguidade Possessiva
+                                </h3>
+                                <i data-lucide="user-x" class="w-5 h-5 text-gray-400"></i>
                             </div>
                             
-                            <div class="flex items-center justify-center text-muted"><i data-lucide="arrow-down" class="w-6 h-6"></i></div>
+                            <div class="p-6 grid md:grid-cols-2 gap-8 items-center">
+                                <div class="text-center relative">
+                                    <div class="bg-black/40 p-4 rounded-lg border border-danger/30 relative z-10">
+                                        <p class="text-gray-300 italic">"O policial prendeu o ladrão em <strong class="text-danger underline decoration-wavy">sua</strong> casa."</p>
+                                    </div>
+                                    <div class="flex justify-between mt-4 text-xs font-mono text-gray-500 relative">
+                                        <div class="absolute top-[-10px] left-1/2 w-px h-4 bg-gray-600 -translate-x-1/2"></div>
+                                        <div class="absolute top-[6px] left-[15%] right-[15%] h-px bg-gray-600"></div>
+                                        <div class="w-1/2 text-center border-r border-gray-600/50 pt-2">
+                                            <i data-lucide="shield" class="w-4 h-4 mx-auto mb-1 text-blue-400"></i>
+                                            Casa do Policial?
+                                        </div>
+                                        <div class="w-1/2 text-center pt-2">
+                                            <i data-lucide="footprints" class="w-4 h-4 mx-auto mb-1 text-orange-400"></i>
+                                            Casa do Ladrão?
+                                        </div>
+                                    </div>
+                                </div>
 
-                            <div class="flex flex-col md:flex-row gap-4 items-center bg-success/10 border border-success/30 p-4 rounded-lg">
-                                <div class="text-success font-bold text-lg min-w-[80px] text-center">A CURA</div>
-                                <div class="flex-1">
-                                    <p class="text-white">Use pronomes "dele/dela" ou repita o nome.</p>
-                                    <p class="text-success italic mt-1">"O policial prendeu o ladrão na casa <strong class="underline">deste</strong>."</p>
+                                <div class="bg-success/5 p-4 rounded-lg border-l-2 border-success">
+                                    <strong class="text-success block mb-2 text-sm flex items-center gap-2">
+                                        <i data-lucide="syringe" class="w-4 h-4"></i> Solução: Trocar o Pronome
+                                    </strong>
+                                    <ul class="space-y-2 text-sm text-gray-300">
+                                        <li>
+                                            <span class="text-white font-bold">DELE/DELA:</span>
+                                            <br>"...na casa <strong class="text-success">dele</strong>." (Do ladrão)
+                                        </li>
+                                        <li>
+                                            <span class="text-white font-bold">PRÓPRIO:</span>
+                                            <br>"...em sua <strong class="text-success">própria</strong> casa." (Do sujeito/policial)
+                                        </li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
+
+                        <div class="bg-paper p-0 rounded-xl border border-border overflow-hidden">
+                            <div class="p-4 bg-white/5 border-b border-white/5 flex items-center justify-between">
+                                <h3 class="font-bold text-white flex items-center gap-2">
+                                    <span class="bg-warning/20 text-warning px-2 py-1 rounded text-xs font-bold">TIPO 2</span>
+                                    Ambiguidade Estrutural (Má Colocação)
+                                </h3>
+                                <i data-lucide="move" class="w-5 h-5 text-gray-400"></i>
+                            </div>
+                            
+                            <div class="p-6 grid md:grid-cols-2 gap-8 items-center">
+                                <div class="text-center">
+                                    <div class="bg-black/40 p-4 rounded-lg border border-warning/30">
+                                        <p class="text-gray-300 italic">"Vende-se berço para criança <strong class="text-warning underline decoration-wavy">de madeira</strong>."</p>
+                                    </div>
+                                    <div class="mt-4 flex items-center justify-center gap-4 text-xs text-gray-500">
+                                        <div class="bg-paper p-2 rounded border border-white/5">
+                                            👶🪵 <br> Criança de madeira?
+                                        </div>
+                                        <i data-lucide="arrow-left-right" class="text-gray-600"></i>
+                                        <div class="bg-paper p-2 rounded border border-white/5">
+                                            🛏️🪵 <br> Berço de madeira?
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-success/5 p-4 rounded-lg border-l-2 border-success">
+                                    <strong class="text-success block mb-2 text-sm flex items-center gap-2">
+                                        <i data-lucide="refresh-ccw" class="w-4 h-4"></i> Solução: Mudar a Ordem
+                                    </strong>
+                                    <p class="text-sm text-gray-300 mb-3">O adjetivo deve ficar <strong>colado</strong> no dono.</p>
+                                    <div class="bg-black/20 p-2 rounded text-sm text-white font-mono">
+                                        "Vende-se berço <strong class="text-success">de madeira</strong> para criança."
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </article>
             </div>  </main>
