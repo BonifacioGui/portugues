@@ -256,10 +256,10 @@
                                     <div class="absolute inset-0 rounded-full bg-emerald-500 blur-2xl opacity-60 animate-pulse scale-125"></div>
                                     <video 
                                         src="endeota.mp4" 
-                                        autoplay 
                                         muted 
-                                        loop  playsinline
-                                        x-effect="if(answered && isCorrect) { $el.currentTime = 0; $el.play() }" 
+                                        loop 
+                                        playsinline
+                                        x-init="$el.play()" 
                                         class="relative z-20 w-80 h-80 object-cover rounded-full border-2 border-success shadow-2xl"
                                     ></video>
                                 </div>
