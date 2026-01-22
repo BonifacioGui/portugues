@@ -251,17 +251,19 @@
                             x-transition:enter="transition ease-out duration-500"
                             x-transition:enter-start="opacity-0 scale-50"
                             x-transition:enter-end="opacity-100 scale-100">
-                            
-                            <div class="relative my-15">
-                                <div class="absolute inset-0 rounded-full bg-emerald-500 blur-2xl opacity-60 animate-pulse scale-125"></div>
-                                <video 
-                                    src="endeota.mp4" 
-                                    autoplay 
-                                    muted 
-                                    playsinline 
-                                    class="relative z-20 w-80 h-80 object-cover rounded-full border-2 border-success shadow-2xl"
-                                ></video>
-                            </div>
+                            <template x-if="answered && isCorrect">
+                                <div class="relative my-15">
+                                    <div class="absolute inset-0 rounded-full bg-emerald-500 blur-2xl opacity-60 animate-pulse scale-125"></div>
+                                    <video 
+                                        src="endeota.mp4" 
+                                        autoplay 
+                                        muted 
+                                        loop  playsinline
+                                        x-effect="if(answered && isCorrect) { $el.currentTime = 0; $el.play() }" 
+                                        class="relative z-20 w-80 h-80 object-cover rounded-full border-2 border-success shadow-2xl"
+                                    ></video>
+                                </div>
+                            </template>
                             <p class="text-emerald-200 text-lg mt-2 font-mono font-bold relative z-20">+10 PONTOS</p>
                         </div>
 
