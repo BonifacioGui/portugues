@@ -20,15 +20,15 @@
                         serif: ['Merriweather', 'serif'],   // Texto corrido (Melhor leitura)
                     },
                     colors: {
-                        bg: '#121212',       /* Preto Suave */
-                        paper: '#1e1e1e',    /* Card */
-                        border: '#2e2e2e',
-                        text: '#e0e0e0',
-                        muted: '#a0a0a0',
-                        primary: '#3b82f6',  /* Azul */
-                        success: '#10b981',  /* Verde */
-                        danger: '#ef4444',   /* Vermelho */
-                        warning: '#f59e0b',  /* Amarelo */
+                        bg: '#09090b',        /* Preto quase total */
+                        paper: '#18181b',     /* Cinza chumbo */
+                        border: '#27272a',
+                        text: '#e4e4e7',
+                        muted: '#a1a1aa',
+                        primary: '#d946ef',   /* Rosa Neon (Fúcsia) */
+                        success: '#22c55e',   /* Verde Neon */
+                        danger: '#ef4444',    /* Vermelho */
+                        warning: '#eab308',   /* Amarelo */
                     }
                 }
             }
@@ -444,11 +444,13 @@
                         <li><a href="#colocacao-avancada" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="magnet" class="w-4 h-4 text-yellow-400"></i> 23. Próclise: Locuções</a></li>
                         <li><a href="#hibridismo" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="git-merge" class="w-4 h-4 text-orange-400"></i> 24. O Texto Híbrido</a></li>
                         <li><a href="#logica" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="brain-circuit" class="w-4 h-4 text-violet-400"></i> 25. Lógica Argumentativa</a></li>
+                        <li><a href="#logica-investigativa" @click="sidebarOpen = false" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-white/5 hover:text-white transition group"><i data-lucide="brain-circuit" class="w-4 h-4 text-violet-400"></i> 26. Evidência vs. Inferência</a></li>
                     </ul>
                 </div>
                 
             </nav>
         </aside>
+
 
         <main class="flex-1 overflow-y-auto relative w-full bg-bg scroll-smooth">
             <div class="max-w-4xl mx-auto px-6 py-12 lg:py-20 space-y-32 pb-40">
@@ -3174,6 +3176,92 @@
                                 <p class="text-xs text-slate-500 italic bg-black/20 p-2 rounded">"O que você diz sobre economia é falso porque você é feio." (Sem lógica).</p>
                             </div>
                         </div>
+                    </div>
+                </article>
+                <hr class="border-border">
+
+                <article id="logica-investigativa" class="scroll-mt-24">
+                    <header class="mb-8 mt-12">
+                        <h2 class="font-sans text-3xl font-extrabold text-white mb-2">26. Evidência vs. Inferência</h2>
+                        <p class="text-muted">A lógica de Sherlock Holmes: Separando o que se VÊ do que se PENSA.</p>
+                    </header>
+
+                    <div class="space-y-8">
+                        
+                        <div class="bg-slate-900/50 border border-indigo-500/20 p-8 rounded-[2rem]">
+                            <h3 class="text-indigo-400 font-bold text-xl mb-6 flex items-center gap-2">
+                                <i data-lucide="search" class="w-6 h-6"></i> O Método Investigativo FGV
+                            </h3>
+                            
+                            <div class="grid md:grid-cols-2 gap-8">
+                                <div class="bg-black/40 p-6 rounded-2xl border-l-4 border-slate-500">
+                                    <strong class="text-slate-200 block mb-2 text-lg">1. Premissa (Evidência)</strong>
+                                    <p class="text-sm text-slate-400 mb-4">É o fato concreto. A "pista" que está visível no mundo.</p>
+                                    <div class="flex items-center gap-3 bg-slate-800/50 p-3 rounded-lg">
+                                        <i data-lucide="eye" class="w-5 h-5 text-slate-400"></i>
+                                        <span class="text-white font-mono text-sm">"O chão está molhado."</span>
+                                    </div>
+                                </div>
+
+                                <div class="bg-black/40 p-6 rounded-2xl border-l-4 border-indigo-500">
+                                    <strong class="text-indigo-400 block mb-2 text-lg">2. Conclusão (Inferência)</strong>
+                                    <p class="text-sm text-slate-400 mb-4">É a dedução mental. A explicação para o fato.</p>
+                                    <div class="flex items-center gap-3 bg-indigo-900/20 p-3 rounded-lg border border-indigo-500/30">
+                                        <i data-lucide="lightbulb" class="w-5 h-5 text-indigo-400"></i>
+                                        <span class="text-white font-mono text-sm">"Deve ter chovido."</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-gradient-to-br from-rose-900/10 to-[#0f1115] border border-rose-500/30 p-8 rounded-[2rem] relative overflow-hidden">
+                            <div class="absolute right-0 top-0 p-6 opacity-5">
+                                <i data-lucide="arrow-right-left" class="w-32 h-32 text-rose-500"></i>
+                            </div>
+
+                            <h4 class="text-rose-400 font-black mb-6 flex items-center gap-3 text-lg uppercase tracking-tight relative z-10">
+                                <i data-lucide="alert-triangle" class="w-6 h-6"></i> Cuidado com a Inversão
+                            </h4>
+
+                            <p class="text-sm text-slate-300 mb-6 relative z-10">
+                                A FGV ama perguntar: <em>"Onde a conclusão vem antes?"</em>. Isso inverte a lógica cronológica (Causa e Efeito).
+                            </p>
+
+                            <div class="grid gap-4 relative z-10">
+                                
+                                <div class="bg-black/60 p-4 rounded-xl border border-white/5 flex items-center justify-between group">
+                                    <div class="flex flex-col">
+                                        <span class="text-[10px] uppercase font-bold text-slate-500">Ordem Padrão (P ➜ C)</span>
+                                        <p class="text-white">"A garrafa está vazia. <span class="text-indigo-400">Alguém bebeu tudo.</span>"</p>
+                                    </div>
+                                    <div class="flex items-center gap-2 text-xs text-slate-500">
+                                        <span>Fato</span>
+                                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                        <span class="text-indigo-400">Ideia</span>
+                                    </div>
+                                </div>
+
+                                <div class="bg-indigo-900/20 p-4 rounded-xl border border-indigo-500/50 flex items-center justify-between shadow-[0_0_20px_rgba(99,102,241,0.1)]">
+                                    <div class="flex flex-col">
+                                        <span class="text-[10px] uppercase font-bold text-indigo-300">Ordem Invertida (C ➜ P)</span>
+                                        <p class="text-white">"<span class="text-indigo-400 font-bold">Choveu ontem.</span> O chão está molhado."</p>
+                                    </div>
+                                    <div class="flex items-center gap-2 text-xs text-indigo-300 font-bold">
+                                        <span>Ideia</span>
+                                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                        <span>Fato</span>
+                                    </div>
+                                </div>
+
+                            </div>
+                            
+                            <div class="mt-6 p-4 bg-rose-500/10 rounded-xl border border-rose-500/20 text-center relative z-10">
+                                <p class="text-xs text-rose-200">
+                                    <strong>Dica de Ouro:</strong> Procure a frase onde a primeira parte é uma <span class="underline">suposição</span> e a segunda parte é a <span class="underline">prova física</span>.
+                                </p>
+                            </div>
+                        </div>
+
                     </div>
                 </article>
             </div>  </main>
